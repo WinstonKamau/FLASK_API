@@ -10,6 +10,7 @@ db=SQLAlchemy()
 
 def create_app(config_name):
     from app.models import BucketList
+    from app.models import Activities
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_configurations[config_name])
     app.config.from_pyfile('config.py')
@@ -87,5 +88,21 @@ def create_app(config_name):
             })
             response.status_code = 200
             return response
-
+    @app.route('/bucketlists/<int:bucket_id>/items/', methods=['POST', 'GET'])
+    def activity_create_bucket(bucket_id):
+        if request.method == "POST":
+            activity_name = str(request.data.get("activity_name", ""))
+            if activity_name:
+                activity_object = Activities(activity_name=activity_name)
+                activity_object.save_activity()
+                response = jsonify({
+                    "id": activity_object.id,
+                    "activity_name": activity_object.activity_name,
+                    "date_created": activity_object.date_created,
+                    "date_modified": activity_object.date_modified
+                })
+                response.status_code = 201
+                return response
+        else:
+            activity_list_object = Activities.read_activity()
     return app
