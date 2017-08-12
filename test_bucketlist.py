@@ -18,13 +18,13 @@ class TheBucketTestCase(unittest.TestCase):
             db.create_all()
 
     def test_bucketlist_creation(self):
-        """a method to test that the API creates a bucket"""
+        """A method to test that the API creates a bucket"""
         result_of_post_method = self.client().post('/bucketlists/', data=self.bucketlist)
         self.assertEqual(result_of_post_method.status_code, 201)
         self.assertIn('Climb the Himalayas', str(result_of_post_method.data))
 
     def test_read_bucket(self):
-        """a method to test that the api reads a bucket"""
+        """A method to test that the api reads a bucket"""
         result_of_post_method = self.client().post('/bucketlists/', data=self.bucketlist)
         self.assertEqual(result_of_post_method.status_code, 201)
         result_of_get_method = self.client().get('/bucketlists/')
@@ -33,7 +33,7 @@ class TheBucketTestCase(unittest.TestCase):
 
 
     def test_read_bucket_using_id(self):
-        """a method to test the retrieval of one bucket using an id placed in brackets
+        """A method to test the retrieval of one bucket using an id placed in brackets
         on the after the '/bucketlists/' statement below
         """
         #a method to post the dictionary "name": "Climb the Himalayas"
@@ -48,7 +48,7 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertIn('Climb the Himalayas', str(final_data.data))
 
     def test_edit_bucketlist(self):
-        """a method to test the editing of a bucket list"""
+        """A method to test the editing of a bucket list"""
         result_of_post_method = self.client().post(
             '/bucketlists/',
             data={'name': 'Summer, Winter'})
@@ -63,7 +63,7 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertIn('The seasons will b', str(result_of_get_method.data))
 
     def test_delete_bucketlist(self):
-        """a method to test the deleting of a bucket list"""
+        """A method to test the deleting of a bucket list"""
         result_of_post_method = self.client().post(
             '/bucketlists/',
             data={'name': 'Summer , Winter'})
@@ -74,7 +74,7 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertEqual(response_after_removal.status_code, 404)
 
     def tearDown(self):
-        '''removing all set variables and deleting our database'''
+        '''A method for removing all set variables and deleting our database'''
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
