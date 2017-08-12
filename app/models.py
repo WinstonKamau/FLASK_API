@@ -8,13 +8,13 @@ class BucketList(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    date_created = db.Column(db.DateTime, default = db.func.current_time.stamp())
-    date_modified = db.Column(db.DateTime, default = db.func.current_time.stamp(), 
-                              onupdate = db.func.current_time.stamp())
+    date_created = db.Column(db.DateTime, default = db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
+                              onupdate = db.func.current_timestamp())
 
-    def __init__(self, bucket_name):
+    def __init__(self, name):
         '''Initialising the bucket list with a name'''
-        self.bucket_name = bucket_name
+        self.name = name
 
     def save_bucket(self):
         '''A method to save the bucket'''
@@ -27,9 +27,9 @@ class BucketList(db.Model):
         db.session.commit()
     
     @staticmethod
-    def get_all():
+    def read_bucket():
         '''A method to return the bucket list in one query'''
-        return Bucketlist.querry.all
+        return BucketList.query.all()
 
     def __repr__(self):
         '''A method that repesents the object instance of the model whenever it queries'''
