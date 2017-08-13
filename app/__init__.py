@@ -90,19 +90,23 @@ def create_app(config_name):
             return response
     @app.route('/bucketlists/<int:bucket_id>/items/', methods=['POST', 'GET'])
     def activity_create_bucket(bucket_id):
+        bucket_object = BucketList.query.get(bucket_id)
+        if not bucket_object:
+                abort(404)
         if request.method == "POST":
-            activity_name = str(request.data.get("activity_name", ""))
-            if activity_name:
-                activity_object = Activities(activity_name=activity_name)
-                activity_object.save_activity()
-                response = jsonify({
-                    "id": activity_object.id,
-                    "activity_name": activity_object.activity_name,
-                    "date_created": activity_object.date_created,
-                    "date_modified": activity_object.date_modified
-                })
-                response.status_code = 201
-                return response
-        else:
-            activity_list_object = Activities.read_activity()
+            if bucket_object:
+                activity_name = str(request.data.get('activity_name', ''))
+                if activity_name:
+                    activity_object = Activities(activity_name=activity_name, bucket_id=bucket_id)
+                    activity_object.save_activity()
+                    response = jsonify({
+                        'id': activity_object.id,
+                        'activity_name': activity_object.activity_name,
+                        'date_created': activity_object.date_created,
+                        'date_modified': activity_object.date_modified,
+                        'bucket_id': activity_object.bucket_id,
+                    })
+                    response.status_code = 201
+                    return response
+    
     return app
