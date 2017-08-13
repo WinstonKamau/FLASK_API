@@ -24,4 +24,18 @@ class TheActivitiesTestCase(unittest.TestCase):
         result_of_post_bucket = self.client().post('/bucketlists/', data=self.bucketlist)
         self.assertEqual(result_of_post_bucket.status_code, 201)
         result_of_post_activity = self.client().post('/bucketlists/1/items/', data=self.activity)
-        self.assertIn('Climb the Himalayas', str(result_of_post_activity.data))
+        self.assertEqual(result_of_post_activity.status_code, 201)
+    
+    def tearDown(self):
+        '''A method for removing all set variables and deleting our database'''
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
+
+    #def test_read_bucket(self):
+        """A method to test that the api reads activiies"""
+        #result_of_post_activity = self.client().post('/bucketlists/0/items/', data=self.activity)
+        #self.assertEqual(result_of_post_activity.status_code, 201)
+        #result_of_get_activity = self.client().get('/bucketlists/')
+        #self.assertEqual(result_of_get_method.status_code, 200)
+        #self.assertIn('Climb the Himalayas', str(result_of_get_method.data))
