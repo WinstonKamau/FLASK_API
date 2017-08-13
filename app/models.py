@@ -1,6 +1,6 @@
 import os
 from app import db
-from flask_bycrypt import Bycrypt
+from flask_bcrypt import Bcrypt
 
 
 class User(db.Model):
