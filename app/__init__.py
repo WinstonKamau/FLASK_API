@@ -3,6 +3,7 @@ from flask import jsonify
 from flask import abort
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
+from extenstions import registration_login_blueprint
 
 from instance.config import app_configurations
 
@@ -109,4 +110,5 @@ def create_app(config_name):
                     response.status_code = 201
                     return response
     
+    app.register_blueprint(registration_login_blueprint)
     return app
