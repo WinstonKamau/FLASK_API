@@ -1,4 +1,5 @@
 import os
+import jwt
 from app import db
 from flask_bcrypt import Bcrypt
 
@@ -28,6 +29,36 @@ class User(db.Model):
         '''A method for adding a user to the database'''
         db.session.add(self)
         db.session.commit()
+
+    def create_encoded_token(self, user_id):
+        '''A method to create a token based on the id of the user and encode it to send
+        to the clients server, the token expires after ten minutes
+        '''
+        try:
+            #A payload with the attribute for the subject of the user's id
+            payload = {
+                'sub': user_id
+            }
+            #Creating a json web token encoded with the algorithm HMAC SHA-256 algorithm
+            json_web_token = jwt.encode(
+                            payload,
+                            current_app.config.get('SECRET'),
+                            algorthim='HS256' 
+                            )
+            return json_web_token
+
+        except Exception as the_exception_generated:
+            #A method to return any exception raised in the try block above
+            return str(the_exception_generated)
+
+    @staticmethod    
+    def decode_token_to_sub(token_received):
+        try:
+            payload = jwt.decode(token_received, current_app.config.get('SECRET'))
+            return payload['sub']
+        except jwt.InvalidTokenError:
+            return 'Register and login to allow valid token'
+
     
     def password_confirm(self, user_password):
         '''A method for comparing the password entered to the password already stored in hash
