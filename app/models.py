@@ -39,15 +39,19 @@ class BucketList(db.Model):
 class Activities(db.Model):
    #table for the activities with the activity name activities
     __activitylist__="activities"
+    
     id = db.Column(db.Integer, primary_key=True)
     activity_name = db.Column(db.String(255))
     date_created = db.Column(db.DateTime, default = db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
                               onupdate = db.func.current_timestamp())
+    bucket_id = db.Column(db.Integer)
 
-    def __init__(self, activity_name):
+
+    def __init__(self, activity_name, bucket_id):
         '''initialising the activity name'''
         self.activity_name = activity_name
+        self.bucket_id = bucket_id
     
     def save_activity(self):
         '''A method to save the activity name'''
