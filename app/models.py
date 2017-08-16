@@ -1,7 +1,9 @@
 import os
+
 import jwt
-from app import db
+
 from flask_bcrypt import Bcrypt
+from app import db, create_app
 
 
 class User(db.Model):
@@ -11,8 +13,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     #nullable set to False because it is required
     #Unique is set to True as two users cannot have the same email
-    user_email = db.Column(db.String(40), nullable=False, unique=True)
-    user_password = db.Column(db.String(40), nullable=False)
+    user_email = db.Column(db.String(300), nullable=False, unique=True)
+    user_password = db.Column(db.String(300), nullable=False)
     bucketlists = db.relationship('BucketList', order_by='BucketList.id', cascade='all, delete-orphan')
 
     def __init__(self, user_email, user_password):
@@ -32,7 +34,7 @@ class User(db.Model):
 
     def create_encoded_token(self, user_id):
         '''A method to create a token based on the id of the user and encode it to send
-        to the clients server, the token expires after ten minutes
+        to the clients server
         '''
         try:
             #A payload with the attribute for the subject of the user's id
@@ -42,7 +44,7 @@ class User(db.Model):
             #Creating a json web token encoded with the algorithm HMAC SHA-256 algorithm
             json_web_token = jwt.encode(
                             payload,
-                            current_app.config.get('SECRET'),
+                            create_app.config.get('SECRET'),
                             algorthim='HS256' 
                             )
             return json_web_token
@@ -54,7 +56,7 @@ class User(db.Model):
     @staticmethod    
     def decode_token_to_sub(token_received):
         try:
-            payload = jwt.decode(token_received, current_app.config.get('SECRET'))
+            payload = jwt.decode(token_received, create_app.config.get('SECRET'))
             return payload['sub']
         except jwt.InvalidTokenError:
             return 'Register and login to allow valid token'
