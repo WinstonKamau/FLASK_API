@@ -1,9 +1,10 @@
 import os
 
 import jwt
-
+from flask import current_app
 from flask_bcrypt import Bcrypt
-from app import db, create_app
+from app import db
+from datetime import datetime, timedelta
 
 
 class User(db.Model):
@@ -39,13 +40,15 @@ class User(db.Model):
         try:
             #A payload with the attribute for the subject of the user's id
             payload = {
-                'sub': user_id
+                'exp': datetime.utcnow() +timedelta(minutes=10),
+                'sub': user_id,
+                'iat': datetime.utcnow()
             }
             #Creating a json web token encoded with the algorithm HMAC SHA-256 algorithm
             json_web_token = jwt.encode(
                             payload,
-                            create_app.config.get('SECRET'),
-                            algorthim='HS256' 
+                            current_app.config.get('SECRET'),
+                            algorithm='HS256' 
                             )
             return json_web_token
 
@@ -56,8 +59,10 @@ class User(db.Model):
     @staticmethod    
     def decode_token_to_sub(token_received):
         try:
-            payload = jwt.decode(token_received, create_app.config.get('SECRET'))
+            payload = jwt.decode(token_received, current_app.config.get('SECRET'))
             return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return "10 minutes passed, your token has expired"
         except jwt.InvalidTokenError:
             return 'Register and login to allow valid token'
 
