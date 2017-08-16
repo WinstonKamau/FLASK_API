@@ -31,7 +31,7 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         self.assertEqual(result_of_post_method.status_code, 201)
         result_of_post_method_2 = self.client().post('/auth/register', data=self.information)
         result = json.loads(result_of_post_method_2.data.decode())
-        self.assertEqual(result['message'], 'The user email entered already exists. ')
+        self.assertEqual(result['message'], 'The user email entered already exists!')
         self.assertEqual(result_of_post_method_2.status_code, 202)
 
     def test_the_user_login(self):
@@ -40,6 +40,7 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         result_of_post_method = self.client().post('/auth/login', data=self.information)
         result = json.loads(result_of_post_method.data.decode())
         self.assertEqual(result['message'], 'User logged in')
+        self.assertNotEqual(result['access-token'], None )
         self.assertEqual(result_of_post_method.status_code, 200)
 
     def test_non_registered_user_login_with_wrong_user_email(self):
@@ -49,11 +50,10 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         }
         result_of_post_method = self.client().post('/auth/login', data=user_data)
         result = json.loads(result_of_post_method.data.decode())
-        self.assertEqual(result['message'], 'Wrong user name entered')
-        self.assertNotEqual(result['access_token'], None)
+        self.assertEqual(result['message'], 'Username does not exist! Register or check the username entered again.')
         self.assertEqual(result_of_post_method.status_code, 401)
 
-    def test_resgistered_user_with_wrong_password(self):
+    def test_registered_user_with_wrong_password(self):
         result_of_post_method = self.client().post('/auth/register', data=self.information)
         self.assertEqual(result_of_post_method.status_code, 201)
         user_data = {
@@ -62,8 +62,8 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         }
         result_of_post_method = self.client().post('/auth/login', data=user_data)
         result = json.loads(result_of_post_method.data.decode())
-        self.assertEqual(result['message'], 'Wrong password entered')
+        self.assertEqual(result['message'], 'Wrong password entered for the user user1@gmail.com !')
         self.assertEqual(result_of_post_method.status_code, 401)
 
-
+    
 
