@@ -3,11 +3,13 @@ from flask import jsonify
 from flask import abort
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
-from extenstions import registration_login_blueprint
-
 from instance.config import app_configurations
-
 db=SQLAlchemy()
+#The import below has to appear after initialisation of db to SQLAlchemy
+#This is because the the extensions uses the db
+from .extensions import registration_login_blueprint
+
+
 
 def create_app(config_name):
     from app.models import BucketList
