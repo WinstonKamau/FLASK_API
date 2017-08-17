@@ -40,7 +40,7 @@ class User(db.Model):
         try:
             #A payload with the attribute for the subject of the user's id
             payload = {
-                'exp': datetime.utcnow() +timedelta(minutes=10),
+                'exp': datetime.utcnow() +timedelta(minutes=60),
                 'sub': user_id,
                 'iat': datetime.utcnow()
             }
