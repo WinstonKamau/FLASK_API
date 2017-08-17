@@ -27,7 +27,7 @@ def create_app(config_name):
         '''a method that will save a bucket list if post is chosen, return
         a bucketlist if GET is chosen, the bucket list returned can be
         thinned down by an id'''
-        header = request.headers.get('Authorisation')
+        header = request.headers.get('Authorization')
         splitted_header = header.split(' ')
         token = splitted_header[1]
         user_id = User.decode_token_to_sub(token)
@@ -74,7 +74,7 @@ def create_app(config_name):
         which is used in setting it as an id. The id allows editing and deleting a
         particular object
         '''
-        header = request.headers.get('Authorisation')
+        header = request.headers.get('Authorization')
         splitted_header = header.split(' ')
         token = splitted_header[1]
         user_id = User.decode_token_to_sub(token)
