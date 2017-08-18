@@ -116,18 +116,16 @@ class Activities(db.Model):
     __activitylist__="activities"
 
     id = db.Column(db.Integer, primary_key=True)
-    activity_name = db.Column(db.String(255))
+    activity_name = db.Column(db.String(300))
     date_created = db.Column(db.DateTime, default = db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
                               onupdate = db.func.current_timestamp())
-    creator_id = db.Column(db.Integer, db.ForeignKey(User.id))
     bucket_id = db.Column(db.Integer, db.ForeignKey(BucketList.id))
 
 
-    def __init__(self, activity_name, user_id, bucket_id):
+    def __init__(self, activity_name, bucket_id):
         '''initialising the activity name, user's and bucketlist's id'''
         self.activity_name = activity_name
-        self.creator_id = user_id
         self.bucket_id = bucket_id
     
     def save_activity(self):
@@ -141,9 +139,9 @@ class Activities(db.Model):
         db.session.commit()
 
     @staticmethod
-    def read_activity(user_id, bucketlist_id):
-        return Activities.query.all(creator_id=user_id, bucket_id=bucketlist_id)
+    def read_activity(activity_id):
+        return Activities.query.all(activity_id=activity_id)
     
     def __repr__(self):
         '''A method that returns an object instance of Activity whenever it queries'''
-        return "Activities: {}>".format(self.name)
+        return "Activities: {}>".format(self.activity_name)
