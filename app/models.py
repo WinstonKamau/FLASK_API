@@ -84,9 +84,10 @@ class BucketList(db.Model):
     date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
                               onupdate = db.func.current_timestamp())
     creator_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    activities = db.relationship('Activities', order_by='Activities.id', cascade='all, delete-orphan')
 
     def __init__(self, name, creator_id):
-        '''Initialising the bucket list with a name'''
+        '''Initialising the bucket list with a name and the user's id'''
         self.name = name
         self.creator_id = creator_id
 
@@ -119,12 +120,14 @@ class Activities(db.Model):
     date_created = db.Column(db.DateTime, default = db.func.current_timestamp())
     date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
                               onupdate = db.func.current_timestamp())
-    bucket_id = db.Column(db.Integer)
+    creator_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    bucket_id = db.Column(db.Integer, db.ForeignKey(BucketList.id))
 
 
-    def __init__(self, activity_name, bucket_id):
-        '''initialising the activity name'''
+    def __init__(self, activity_name, user_id, bucket_id):
+        '''initialising the activity name, user's and bucketlist's id'''
         self.activity_name = activity_name
+        self.creator_id = user_id
         self.bucket_id = bucket_id
     
     def save_activity(self):
@@ -138,8 +141,8 @@ class Activities(db.Model):
         db.session.commit()
 
     @staticmethod
-    def read_activity():
-        return Activities.query.all()
+    def read_activity(user_id, bucketlist_id):
+        return Activities.query.all(creator_id=user_id, bucket_id=bucketlist_id)
     
     def __repr__(self):
         '''A method that returns an object instance of Activity whenever it queries'''
