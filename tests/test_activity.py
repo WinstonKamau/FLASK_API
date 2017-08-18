@@ -33,38 +33,103 @@ class TheActivitiesTestCase(unittest.TestCase):
     def post_a_bucket(self):
         '''A method that posts a bucket to the test_db, ideally all other
         methods use it so it acts as a method for posting for tests below.
-        The method posts after registering and logging in
+        The method posts after registering and logging in and returns json
+        data for posting an activity
         '''
-        return self.client().post('/bucketlists/',
+        post_bucket_data = self.client().post('/bucketlists/',
                                   headers=dict(Authorization='Bearer '
                                                + self.register_login_and_return_token()
                                               ),
                                   data=self.bucketlist
                                  )
-
-    def test_activity_creation(self):
-        """A method to test that the API creates an activity"""
-        post_bucket_data = self.post_a_bucket()
-        self.assertEqual(post_bucket_data.status_code, 201)
         json_data = json.loads(post_bucket_data.data.decode('utf-8').replace("'", "\""))
-        result_of_post_activity = self.client().post('/bucketlists/{}/items/'.format(json_data['id']),
+        return json_data
+
+    def post_an_activity(self):
+        '''A method that posts and activity and returns the response'''
+        bucket_json_data = self.post_a_bucket()
+        return self.client().post('/bucketlists/{}/items/'.format(bucket_json_data['id']),
                                                      headers=dict(Authorization='Bearer '
                                                                   + self.register_login_and_return_token()
                                                                   ),
                                                      data=self.activity)
-        self.assertEqual(result_of_post_activity.status_code, 201)
-        self.assertIn('Climb the Himalayas', str(result_of_post_activity.data)
+        
+
+    def test_activity_creation(self):
+        """A method to test that the API creates an activity"""
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        self.assertIn('Climb the Himalayas', str(post_activity_data.data))
     
+    def test_getting_all_activitites(self):
+        '''A method to test that the API gets back all activities'''
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        result_of_get_activity = self.client().get('/bucketlists/1/items/',
+                                                     headers=dict(Authorization='Bearer '
+                                                                 + self.register_login_and_return_token()
+                                                                  ),
+                                                     )
+        self.assertEqual(result_of_get_activity.status_code, 200)
+        self.assertIn('Climb the Himalayas', str(result_of_get_activity.data))
+    
+    def test_getting_activity_using_an_id(self):
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        second_activity = {"activity_name": "Climb Mt. Kilimanjaro"}
+        post_activity_data_2 = self.client().post('/bucketlists/1/items/',
+                                                     headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  ),
+                                                     data=second_activity)
+        self.assertEqual(post_activity_data_2.status_code, 201)
+        result_of_get_activity_1 = self.client().get('/bucketlists/1/items/1',
+                                                     headers=dict(Authorization='Bearer '
+                                                                 + self.register_login_and_return_token()
+                                                                  ),
+                                                     )
+        self.assertEqual(result_of_get_activity_1.status_code, 200)
+        self.assertIn('Climb the Himalayas', str(result_of_get_activity_1.data))                                       
+        result_of_get_activity_2 = self.client().get('/bucketlists/1/items/2',
+                                                     headers=dict(Authorization='Bearer '
+                                                                 + self.register_login_and_return_token()
+                                                                  )
+                                                     )
+        self.assertEqual(result_of_get_activity_1.status_code, 200)
+        self.assertIn('Climb Mt. Kilimanjaro', str(result_of_get_activity_2.data))
+
+    def test_updating_an_activity(self):
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        update_activity = {"activity_name": "Climb Mt. Kilimanjaro"}
+        result_of_put = self.client().put('/bucketlists/1/items/1',
+                                         headers=dict(Authorization='Bearer '
+                                         + self.register_login_and_return_token()),
+                                         data=update_activity
+                                         )
+        self.assertEqual(result_of_put.status_code, 200)
+        self.assertIn('Climb Mt. Kilimanjaro', str(result_of_put.data))
+
+    def test_deleting_an_activity(self):
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        result_of_delete_activity = self.client().delete('bucketlists/1/items/1',
+                                                        headers=dict(Authorization='Bearer '
+                                                        + self.register_login_and_return_token())
+                                                        )
+        self.assertEqual(result_of_delete_activity.status_code, 200)
+        result_of_delete_activity_2 = self.client().delete('bucketlists/1/items/1',
+                                                        headers=dict(Authorization='Bearer '
+                                                        + self.register_login_and_return_token())
+                                                        )
+        self.assertEqual(result_of_delete_activity_2.status_code, 404)
+
+    
+
+
+
     def tearDown(self):
         '''A method for removing all set variables and deleting our database'''
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
-
-    #def test_read_bucket(self):
-        """A method to test that the api reads activiies"""
-        #result_of_post_activity = self.client().post('/bucketlists/0/items/', data=self.activity)
-        #self.assertEqual(result_of_post_activity.status_code, 201)
-        #result_of_get_activity = self.client().get('/bucketlists/')
-        #self.assertEqual(result_of_get_method.status_code, 200)
-        #self.assertIn('Climb the Himalayas', str(result_of_get_method.data))
