@@ -45,6 +45,11 @@ def create_app(config_name):
                         'creator_id': user_id
                     })
                     return make_response(response), 201
+                else:
+                    response = jsonify ({
+                        'message': 'The key variable name has not been entered!'
+                    })
+                    return make_response(response), 400
             else:
                 list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
                 bucketlist_objects_list = []
@@ -55,7 +60,7 @@ def create_app(config_name):
                                         'name': item.name,
                                         'date_created': item.date_created,
                                         'date_modified': item.date_modified,
-                                        'creator_id': user_id
+                                        'creator_id': item.creator_id
                     }
                     bucketlist_objects_list.append(a_bucket_object)
                 #converting the bucket list objec into JSON
@@ -116,6 +121,102 @@ def create_app(config_name):
                 'userid': user_id
             }
             return make_response(jsonify(response)), 401
-        
+    @app.route('/bucketlists/<int:bucket_id>/items/', methods=['POST', 'GET'])
+    def activities(bucket_id):
+        header = request.headers.get('Authorization')
+        splitted_header = header.split(" ")
+        token = splitted_header[1]
+        user_id = User.decode_token_to_sub(token)
+        if not isinstance(user_id, str):
+            if request.method == 'POST':
+                activity_name = str(request.data.get('activity_name', ''))
+                if activity_name:
+                    activity_object = Activities(activity_name=activity_name, bucket_id=bucket_id)    
+                    activity_object.save_activity()
+                    response = jsonify({
+                        'id': activity_object.id,
+                        'activity_name': activity_object.activity_name,
+                        'date_created': activity_object.date_created,
+                        'date_modified': activity_object.date_modified,
+                        'bucket_id': activity_object.bucket_id
+                    })
+                    return make_response(response), 201
+                else:
+                    response = jsonify ({
+                        'message': 'The activity_name key has not been entered therefore the activity has not been created',
+                    })
+                    return make_response(response), 400
+            else:
+                activitieslist = Activities.query.filter_by(bucket_id=bucket_id)
+                activity_array = []
+                for item in activitieslist:
+                    activity_item = {
+                        'id': item.id,
+                        'activity_name': item.activity_name,
+                        'date_created': item.date_created,
+                        'date_modified': item.date_modified,
+                        'bucket_id': item.bucket_id 
+                    }
+                    activity_array.append(activity_item)
+                response = jsonify(activity_array)
+                return make_response(response), 200
+        else:
+            response = {
+                'message': 'User is is a string',
+                'userid': user_id
+            }
+            return make_response(jsonify(response)), 401
+    @app.route('/bucketlists/<int:bucket_id>/items/<int:activity_id>', methods = ['GET', 'PUT', 'DELETE'])
+    def activity_manipulation(bucket_id, activity_id):
+        header = request.headers.get('Authorization')
+        splitted_header = header.split(" ")
+        token = splitted_header[1]
+        user_id = User.decode_token_to_sub(token)
+        if not isinstance(user_id, str):
+            activity_object = Activities.query.filter_by(id=activity_id).first()
+            if not activity_object:
+                abort (404)
+            if request.method == 'PUT':
+                activity_name = request.data['activity_name']
+                if activity_name:
+                    activity_object.activity_name = activity_name
+                    activity_object.save_activity()
+                    response = jsonify ({
+                        'id': activity_object.id,
+                        'date_created': activity_object.date_created,
+                        'date_modified': activity_object.date_modified,
+                        'bucket_id': activity_object.bucket_id,
+                        'activity_name': activity_object.activity_name
+                    })
+                    return make_response(response), 200
+                else:
+                    response = jsonify({
+                        'message': 'No key of activity_name was used in replacing'
+                    }) 
+                    return make_respons(response), 400
+            if request.method == 'DELETE':
+                response = jsonify({
+                    'message': "Deleted activity {}".format(activity_object.id)
+                })
+                activity_object.delete_activity()
+                return make_response(response), 200 
+               
+            else:
+                response = jsonify ({
+                    'id': activity_object.id,
+                    'date_created': activity_object.date_created,
+                    'date_modified': activity_object.date_modified,
+                    'bucket_id': activity_object.bucket_id,
+                    'activity_name': activity_object.activity_name
+                })    
+                return make_response(response), 200
+        else:
+            response = {
+                'message': 'The user id is a string and not an integer',
+                'user_id': user_id
+            }
+    
+    
+    
     app.register_blueprint(registration_login_blueprint)
     return app
