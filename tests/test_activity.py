@@ -53,6 +53,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                                   ),
                                                      data=self.activity)
         self.assertEqual(result_of_post_activity.status_code, 201)
+        self.assertIn('Climb the Himalayas', str(result_of_post_activity.data)
     
     def tearDown(self):
         '''A method for removing all set variables and deleting our database'''
