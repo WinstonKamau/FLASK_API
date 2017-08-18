@@ -45,6 +45,29 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertEqual(post_data.status_code, 201)
         self.assertIn('Climb the Himalayas', str(post_data.data))
 
+    def test_bucketlist_creation_sad_path_1(self):
+        '''Posting a path with wrong key and no key name provided'''
+        wrong_key = {'wrong_key': 'Travel'}
+        result_of_wrong_key = self.client().post('/bucketlists/',
+                                  headers=dict(Authorization='Bearer '
+                                               + self.register_login_and_return_token()
+                                              ),
+                                  data=wrong_key
+                                 )
+        self.assertEqual(result_of_wrong_key.status_code, 400)
+        self.assertIn('The key variable name', str(result_of_wrong_key.data))
+        result_of_wrong_key_2 = self.client().post('/bucketlists/',
+                                  headers=dict(Authorization='Bearer '
+                                               + self.register_login_and_return_token()
+                                              ))
+        self.assertEqual(result_of_wrong_key_2.status_code, 400)
+    
+    def test_bucketlist_creation_sad_path_2(self):
+        post_data = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 201)
+        post_data_second_time = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 202)
+
     def test_read_bucket(self):
         """A method to test that the api reads a bucket"""
         post_data = self.post_a_bucket()
