@@ -62,21 +62,44 @@ def create_app(config_name):
                     })
                     return make_response(response), 400
             else:
-                list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
-                bucketlist_objects_list = []
+                bucket_name_to_search = request.args.get('q')
+                if bucket_name_to_search:
+                    bucketlist_list = BucketList.query.filter_by(creator_id = user_id) 
+                    buckets = []
+                    for item in bucketlist_list:
+                        if item.name == bucket_name_to_search:
+                            a_bucket_object = {
+                                            'id': item.id,
+                                            'name': item.name,
+                                            'date_created': item.date_created,
+                                            'date_modified': item.date_modified,
+                                            'creator_id': item.creator_id
+                                        }
+                            buckets.append(a_bucket_object)
+                    if len(buckets) > 0 :
+                        response = jsonify (buckets)    
+                        return make_response(response), 200
+                    else:
+                        response = jsonify({
+                            'message': 'Name does not exist'
+                        })
+                        return make_response(response), 202
+                else: 
+                    list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
+                    bucketlist_objects_list = []
 
-                for item in list_of_bucketlist:
-                    a_bucket_object = {
-                                        'id': item.id,
-                                        'name': item.name,
-                                        'date_created': item.date_created,
-                                        'date_modified': item.date_modified,
-                                        'creator_id': item.creator_id
-                    }
-                    bucketlist_objects_list.append(a_bucket_object)
-                #converting the bucket list objec into JSON
-                response = jsonify(bucketlist_objects_list)
-                return make_response(response), 200
+                    for item in list_of_bucketlist:
+                        a_bucket_object = {
+                                            'id': item.id,
+                                            'name': item.name,
+                                            'date_created': item.date_created,
+                                            'date_modified': item.date_modified,
+                                            'creator_id': item.creator_id
+                        }
+                        bucketlist_objects_list.append(a_bucket_object)
+                    #converting the bucket list objec into JSON
+                    response = jsonify(bucketlist_objects_list)
+                    return make_response(response), 200
         else:
             response = {
                 'message': 'User id is a string',
