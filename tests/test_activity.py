@@ -61,6 +61,18 @@ class TheActivitiesTestCase(unittest.TestCase):
         self.assertEqual(post_activity_data.status_code, 201)
         self.assertIn('Climb the Himalayas', str(post_activity_data.data))
     
+    def test_activity_creation_sad_path_1(self):
+        '''A method to test that activity is not created if it already exists'''
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        post_activity_data_second_time = self.client().post('/bucketlists/1/items/',
+                                                     headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  ),
+                                                     data=self.activity)
+        self.assertEqual(post_activity_data_second_time.status_code, 202)
+
+
     def test_getting_all_activitites(self):
         '''A method to test that the API gets back all activities'''
         post_activity_data = self.post_an_activity()
@@ -109,6 +121,19 @@ class TheActivitiesTestCase(unittest.TestCase):
                                          )
         self.assertEqual(result_of_put.status_code, 200)
         self.assertIn('Climb Mt. Kilimanjaro', str(result_of_put.data))
+
+    def test_updating_an_activity_sad_path_1(self):
+        '''Test that an activity is not updated if it already exists'''
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        update_activity = {"activity_name": "Climb the Himalayas"}
+        result_of_put = self.client().put('/bucketlists/1/items/1',
+                                         headers=dict(Authorization='Bearer '
+                                         + self.register_login_and_return_token()),
+                                         data=update_activity
+                                         )
+        self.assertEqual(result_of_put.status_code, 202)
+
 
     def test_deleting_an_activity(self):
         post_activity_data = self.post_an_activity()
