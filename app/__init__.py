@@ -209,19 +209,42 @@ def create_app(config_name):
                     })
                     return make_response(response), 400
             else:
-                activitieslist = Activities.query.filter_by(bucket_id=bucket_id)
-                activity_array = []
-                for item in activitieslist:
-                    activity_item = {
-                        'id': item.id,
-                        'activity_name': item.activity_name,
-                        'date_created': item.date_created,
-                        'date_modified': item.date_modified,
-                        'bucket_id': item.bucket_id 
-                    }
-                    activity_array.append(activity_item)
-                response = jsonify(activity_array)
-                return make_response(response), 200
+                search = request.args.get('q')
+                if search:
+                    activities_list = Activities.query.filter_by(bucket_id=bucket_id)
+                    activity_array = []
+                    for item in activities_list:
+                        if item.activity_name.lower() == search.lower():
+                            activity_object = {
+                                'id': item.id,
+                                'activity_name': item.activity_name,
+                                'date_created': item.date_created,
+                                'date_modified': item.date_modified,
+                                'bucket_id': item.bucket_id
+                            }
+                            activity_array.append(activity_object)
+                    if len(activity_array) > 0 :
+                        response = jsonify(activity_array)
+                        return make_response(response), 200
+                    else:
+                        response = jsonify({
+                            'message': 'The activity name does not exist'
+                        })    
+                        return make_response(response), 202
+                else:
+                    activitieslist = Activities.query.filter_by(bucket_id=bucket_id)
+                    activity_array = []
+                    for item in activitieslist:
+                        activity_item = {
+                            'id': item.id,
+                            'activity_name': item.activity_name,
+                            'date_created': item.date_created,
+                            'date_modified': item.date_modified,
+                            'bucket_id': item.bucket_id 
+                        }
+                        activity_array.append(activity_item)
+                    response = jsonify(activity_array)
+                    return make_response(response), 200
         else:
             response = {
                 'message': 'User is is a string',
