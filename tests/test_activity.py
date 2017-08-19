@@ -127,6 +127,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                   )
         self.assertEqual(result_of_get_activity.status_code, 200)
         self.assertIn('Climb Mt. Kilimanjaro', str(result_of_get_activity.data))
+        self.assertNotIn('Climb the Himalayas', str(result_of_get_activity.data))
 
     def test_updating_an_activity(self):
         post_activity_data = self.post_an_activity()
