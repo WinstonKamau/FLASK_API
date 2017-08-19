@@ -95,6 +95,22 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertEqual(final_data.status_code, 200)
         self.assertIn('Climb the Himalayas', str(final_data.data))
 
+    def test_read_bucket_using_q(self):
+        post_data = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 201)
+        post_data_2 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Family"})
+        result_of_get_method = self.client().get("/bucketlists/?q=Climb the Himalayas",
+                                                headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token())
+                                                )   
+        self.assertEqual(result_of_get_method.status_code, 200)
+        self.assertIn("Climb the Himalayas", str(result_of_get_method.data))
+        self.assertNotIn('Family', str(result_of_get_method.data))
+
+
     def test_edit_bucketlist(self):
         """A method to test the editing of a bucket list"""
         post_data = self.post_a_bucket()
