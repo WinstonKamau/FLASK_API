@@ -159,16 +159,27 @@ def create_app(config_name):
             if request.method == 'POST':
                 activity_name = str(request.data.get('activity_name', ''))
                 if activity_name:
-                    activity_object = Activities(activity_name=activity_name, bucket_id=bucket_id)    
-                    activity_object.save_activity()
-                    response = jsonify({
-                        'id': activity_object.id,
-                        'activity_name': activity_object.activity_name,
-                        'date_created': activity_object.date_created,
-                        'date_modified': activity_object.date_modified,
-                        'bucket_id': activity_object.bucket_id
-                    })
-                    return make_response(response), 201
+                    activities_to_be_checked = Activities.query.filter_by(bucket_id=bucket_id)
+                    status_of_similarity = False
+                    for item in activities_to_be_checked:
+                        if activity_name.lower() == item.activity_name.lower():
+                            status_of_similarity = True
+                    if status_of_similarity == False:
+                        activity_object = Activities(activity_name=activity_name, bucket_id=bucket_id)    
+                        activity_object.save_activity()
+                        response = jsonify({
+                            'id': activity_object.id,
+                            'activity_name': activity_object.activity_name,
+                            'date_created': activity_object.date_created,
+                            'date_modified': activity_object.date_modified,
+                            'bucket_id': activity_object.bucket_id
+                        })
+                        return make_response(response), 201
+                    else:
+                        response = jsonify({
+                            'message': "An activity already exists with the name {} provided.".format(activity_name)
+                        })
+                        return make_response(response), 202
                 else:
                     response = jsonify ({
                         'message': 'The activity_name key has not been entered therefore the activity has not been created',
@@ -207,16 +218,27 @@ def create_app(config_name):
             if request.method == 'PUT':
                 activity_name = request.data['activity_name']
                 if activity_name:
-                    activity_object.activity_name = activity_name
-                    activity_object.save_activity()
-                    response = jsonify ({
-                        'id': activity_object.id,
-                        'date_created': activity_object.date_created,
-                        'date_modified': activity_object.date_modified,
-                        'bucket_id': activity_object.bucket_id,
-                        'activity_name': activity_object.activity_name
-                    })
-                    return make_response(response), 200
+                    activities_to_be_checked = Activities.query.filter_by(bucket_id=bucket_id)
+                    status_of_similarity = False
+                    for item in activities_to_be_checked:
+                        if activity_name.lower() == item.activity_name.lower():
+                            status_of_similarity = True
+                    if status_of_similarity == False:
+                        activity_object.activity_name = activity_name
+                        activity_object.save_activity()
+                        response = jsonify ({
+                            'id': activity_object.id,
+                            'date_created': activity_object.date_created,
+                            'date_modified': activity_object.date_modified,
+                            'bucket_id': activity_object.bucket_id,
+                            'activity_name': activity_object.activity_name
+                        })
+                        return make_response(response), 200
+                    else:
+                        response = jsonify({
+                            'message': "An activity already exists with the name {} provided.".format(activity_name)
+                        })
+                        return make_response(response), 202
                 else:
                     response = jsonify({
                         'message': 'No key of activity_name was used in replacing'
