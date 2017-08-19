@@ -109,7 +109,16 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertEqual(result_of_get_method.status_code, 200)
         self.assertIn("Climb the Himalayas", str(result_of_get_method.data))
         self.assertNotIn('Family', str(result_of_get_method.data))
-
+    
+    def test_read_bucket_using_q_sad_path(self):
+        post_data = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 201)
+        result_of_get_method = self.client().get("/bucketlists/?q=aisdo",
+                                                headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token())
+                                                )   
+        self.assertEqual(result_of_get_method.status_code, 202)
+        self.assertIn('Name does not exist', str(result_of_get_method.data))
 
     def test_edit_bucketlist(self):
         """A method to test the editing of a bucket list"""
