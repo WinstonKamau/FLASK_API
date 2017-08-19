@@ -120,6 +120,13 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                                   ),
                                                      data=second_activity)
         self.assertEqual(post_activity_data_2.status_code, 201)
+        result_of_get_activity = self.client().get('bucketlists/1/items/q=Climb Mt. Kilimanjaro',
+                                                    headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  )
+                                                  )
+        self.assertEqual(result_of_get_activity.status_code, 200)
+        self.assertIn('Climb Mt. Kilimanjaro', str(result_of_get_activity.data))
 
     def test_updating_an_activity(self):
         post_activity_data = self.post_an_activity()
