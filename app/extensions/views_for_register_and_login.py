@@ -16,8 +16,6 @@ class Registration(MethodView):
                 user_email = data_posted['user_email']
                 try:
                     user_password = data_posted['user_password']
-                    print(user_email)
-                    print(user_password)
                     user = User(user_email=user_email, user_password=user_password)
                     user.save_user()
                     response = {
