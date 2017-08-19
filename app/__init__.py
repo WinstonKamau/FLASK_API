@@ -34,17 +34,28 @@ def create_app(config_name):
         if not isinstance(user_id, str):
             if request.method == "POST":
                 name = str(request.data.get('name', ''))
+                status_of_similarity = False
                 if name:
-                    bucket_object = BucketList(name=name, creator_id=user_id)
-                    bucket_object.save_bucket()
-                    response = jsonify({
-                        'id': bucket_object.id,
-                        'name': bucket_object.name,
-                        'date_created': bucket_object.date_created,
-                        'date_modified': bucket_object.date_modified,
-                        'creator_id': user_id
-                    })
-                    return make_response(response), 201
+                    bucketlists_to_be_checked = BucketList.query.filter_by(creator_id=user_id)
+                    for item in bucketlists_to_be_checked:
+                        if name.lower() == item.name.lower():
+                            status_of_similarity = True     
+                    if status_of_similarity == False:
+                        bucket_object = BucketList(name=name, creator_id=user_id)
+                        bucket_object.save_bucket()
+                        response = jsonify({
+                            'id': bucket_object.id,
+                            'name': bucket_object.name,
+                            'date_created': bucket_object.date_created,
+                            'date_modified': bucket_object.date_modified,
+                            'creator_id': user_id
+                        })
+                        return make_response(response), 201
+                    else:
+                        response = jsonify ({
+                            'message': 'A bucket list exists with a similar name of {}!'.format(name)
+                        })
+                        return make_response(response), 202
                 else:
                     response = jsonify ({
                         'message': 'The key variable name has not been entered!'
@@ -96,16 +107,33 @@ def create_app(config_name):
 
             elif request.method == 'PUT':
                 name = str(request.data.get('name', ''))
-                bucket_object.name = name
-                bucket_object.save_bucket()
-                response = jsonify({
-                    'id': bucket_object.id,
-                    'name': bucket_object.name,
-                    'date_created': bucket_object.date_created,
-                    'date_modified': bucket_object.date_modified,
-                    'creator_id': bucket_object.creator_id
-                })
-                return make_response(response), 200
+                status_of_similarity = False
+                if name:
+                    bucketlists_to_be_checked = BucketList.query.filter_by(creator_id=user_id)
+                    for item in bucketlists_to_be_checked:
+                        if name.lower() == item.name.lower():
+                            status_of_similarity = True     
+                    if status_of_similarity == False:
+                        bucket_object.name = name
+                        bucket_object.save_bucket()
+                        response = jsonify({
+                            'id': bucket_object.id,
+                            'name': bucket_object.name,
+                            'date_created': bucket_object.date_created,
+                            'date_modified': bucket_object.date_modified,
+                            'creator_id': bucket_object.creator_id
+                        })
+                        return make_response(response), 200
+                    else:
+                        response = jsonify ({
+                            'message': 'A bucket list exists with a similar name of {}!'.format(name)
+                        })
+                        return make_response(response), 202
+                else:
+                    response = jsonify ({
+                        'message': 'The key variable name has not been entered!'
+                    })
+                    return make_response(response), 400
             else:
                 response = jsonify({
                     'id': bucket_object.id,
