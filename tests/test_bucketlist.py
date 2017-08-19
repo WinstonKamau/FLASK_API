@@ -66,7 +66,8 @@ class TheBucketTestCase(unittest.TestCase):
         post_data = self.post_a_bucket()
         self.assertEqual(post_data.status_code, 201)
         post_data_second_time = self.post_a_bucket()
-        self.assertEqual(post_data.status_code, 202)
+        self.assertEqual(post_data_second_time.status_code, 202)
+        self.assertIn('A bucket list exists with a similar name of', str(post_data_second_time.data))
 
     def test_read_bucket(self):
         """A method to test that the api reads a bucket"""
@@ -112,6 +113,19 @@ class TheBucketTestCase(unittest.TestCase):
                                                               + self.register_login_and_return_token())
                                                 )
         self.assertIn('The seasons will b', str(result_of_get_method.data))
+
+    def test_edit_bucketlist_sad_path_1(self):
+        post_data = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 201)
+        result_of_put_method = self.client().put(
+            '/bucketlists/1',
+            headers=dict(Authorization='Bearer '
+                         + self.register_login_and_return_token()
+                        ),
+            data={
+                "name": "Climb the Himalayas"
+            })
+        self.assertEqual(result_of_put_method.status_code, 202)
 
     def test_delete_bucketlist(self):
         """A method to test the deleting of a bucket list"""
