@@ -174,10 +174,10 @@ class TheBucketTestCase(unittest.TestCase):
                                                     + self.register_login_and_return_token())
                                                 )
         self.assertEqual(result_of_get_method.status_code, 202)
-        self.assertIn('Zero returns no buckets!', str(result_of_get_method.data))
+        self.assertIn('Zero returns no buckets', str(result_of_get_method.data))
 
     def test_read_bucket_using_limit_sad_path_2(self):
-                post_data = self.post_a_bucket()
+        post_data = self.post_a_bucket()
         self.assertEqual(post_data.status_code, 201)
         post_data_2 = self.client().post('/bucketlists/',
                                         headers=dict(Authorization='Bearer '
@@ -207,11 +207,25 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertIn('Acts of Kindness', str(result_of_get_method.data))
 
     def test_read_bucket_using_wrong_value(self):
+        post_data = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 201)
+        post_data_2 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Family"})
+        post_data_3 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Travel"})
+        post_data_4 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Adventure"})
         result_of_get_method = self.client().get('/bucketlists/?m=7',
                                                  headers=dict(Authorization='Bearer '
                                                     + self.register_login_and_return_token())
                                                 )
-        self.assertEqual(result_of_get_method.status_code, 400)
+        self.assertEqual(result_of_get_method.status_code, 200)
         self.assertIn('Wrong value entered', str(result_of_get_method.data))
 
     def test_edit_bucketlist(self):
