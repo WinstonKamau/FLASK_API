@@ -63,6 +63,7 @@ def create_app(config_name):
                     return make_response(response), 400
             else:
                 bucket_name_to_search = request.args.get('q')
+                limit_to_return = request.args.get('limit')
                 if bucket_name_to_search:
                     bucketlist_list = BucketList.query.filter_by(creator_id = user_id) 
                     buckets = []
@@ -82,6 +83,26 @@ def create_app(config_name):
                     else:
                         response = jsonify({
                             'message': 'Name does not exist'
+                        })
+                        return make_response(response), 202
+                elif limit_to_return:
+                    if int(limit_to_return) > 0:
+                        bucketlist_list = BucketList.query.filter_by(creator_id = user_id).limit(int (limit_to_return))
+                        buckets = []
+                        for item in bucketlist_list:
+                            a_bucket_object = {
+                                'id': item.id,
+                                'name': item.name,
+                                'date_created': item.date_created,
+                                'date_modified': item.date_modified,
+                                'creator_id': item.creator_id
+                            }
+                            buckets.append(a_bucket_object)
+                        response = jsonify(buckets)
+                        return make_response(response), 200
+                    else:
+                        response = jsonify({
+                            'message': 'Zero returns no buckets'
                         })
                         return make_response(response), 202
                 else: 
