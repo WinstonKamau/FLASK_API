@@ -140,6 +140,41 @@ class TheActivitiesTestCase(unittest.TestCase):
         self.assertEqual(result_of_get_activity.status_code, 202)
         self.assertIn('The activity name does not exist', str(result_of_get_activity.data))
 
+    def test_getting_activity_using_limit(self):
+        post_activity_data = self.post_an_activity()
+        self.assertEqual(post_activity_data.status_code, 201)
+        second_activity = {"activity_name": "Climb Mt. Kilimanjaro"}
+        third_activity = {"activity_name": "Climb the Alps"}
+        fourth_activity = {"activity_name": "Climb Mt. Everest"}
+        post_activity_data_2 = self.client().post('/bucketlists/1/items/',
+                                                     headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  ),
+                                                     data=second_activity)
+        self.assertEqual(post_activity_data_2.status_code, 201)
+        post_activity_data_2 = self.client().post('/bucketlists/1/items/',
+                                                     headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  ),
+                                                     data=third_activity)
+        self.assertEqual(post_activity_data_2.status_code, 201)
+        post_activity_data_2 = self.client().post('/bucketlists/1/items/',
+                                                     headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  ),
+                                                     data=fourth_activity)
+        self.assertEqual(post_activity_data_2.status_code, 201)
+        result_of_get_activity = self.client().get('bucketlists/1/items/?limit=2',
+                                                    headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  )
+                                                  )
+        self.assertEqual(result_of_get_activity.status_code, 200)
+        self.assertIn('Climb the Himalayas', str(result_of_get_activity.data))
+        self.assertIn('Climb Mt.Kilimanjaro', str(result_of_get_activity.data))
+        self.assertNotIn('Climb the Alps', str(result_of_get_activity.data))
+        self.assertNotIn('Climb Mt. Everest', str(result_of_get_activity.data))
+
     def test_updating_an_activity(self):
         post_activity_data = self.post_an_activity()
         self.assertEqual(post_activity_data.status_code, 201)
