@@ -120,6 +120,36 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertEqual(result_of_get_method.status_code, 202)
         self.assertIn('Name does not exist', str(result_of_get_method.data))
 
+    def test_read_bucket_using_limit(self):
+        post_data = self.post_a_bucket()
+        self.assertEqual(post_data.status_code, 201)
+        post_data_2 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Family"})
+        post_data_3 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Travel"})
+        post_data_4 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Adventure"})
+        post_data_5 = self.client().post('/bucketlists/',
+                                        headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token()),
+                                        data={"name": "Acts of Kindness"})
+        result_of_get_method = self.client().get('/bucketlists/?limit=3',
+                                                 headers=dict(Authorization='Bearer '
+                                                    + self.register_login_and_return_token())
+                                                )
+        self.assertEqual(result_of_get_method.status_code, 200)
+        self.assertIn('Family', str(result_of_get_method.data))
+        self.assertIn('Travel', str(result_of_get_method.data))
+        self.assertIn('Climb the Himalayas', str(result_of_get_method.data))
+        self.assertNotIn('Adventure', str(result_of_get_method.data))
+        self.assertNotIn('Acts of Kindness', str(result_of_get_method.data))
+
     def test_edit_bucketlist(self):
         """A method to test the editing of a bucket list"""
         post_data = self.post_a_bucket()
