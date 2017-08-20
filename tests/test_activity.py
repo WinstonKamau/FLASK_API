@@ -171,9 +171,20 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                   )
         self.assertEqual(result_of_get_activity.status_code, 200)
         self.assertIn('Climb the Himalayas', str(result_of_get_activity.data))
-        self.assertIn('Climb Mt.Kilimanjaro', str(result_of_get_activity.data))
+        self.assertIn('Climb Mt. Kilimanjaro', str(result_of_get_activity.data))
         self.assertNotIn('Climb the Alps', str(result_of_get_activity.data))
         self.assertNotIn('Climb Mt. Everest', str(result_of_get_activity.data))
+        result_of_get_activity_1 = self.client().get('bucketlists/1/items/?limit=0',
+                                                    headers=dict(Authorization='Bearer '
+                                                                  + self.register_login_and_return_token()
+                                                                  )
+                                                  )
+        self.assertEqual(result_of_get_activity_1.status_code, 202)
+        self.assertNotIn('Climb the Himalayas', str(result_of_get_activity_1.data))
+        self.assertNotIn('Climb Mt. Kilimanjaro', str(result_of_get_activity_1.data))
+        self.assertNotIn('Climb the Alps', str(result_of_get_activity_1.data))
+        self.assertNotIn('Climb Mt. Everest', str(result_of_get_activity_1.data)) 
+        self.assertIn('Zero returns no item', str(result_of_get_activity_1.data))                                       
 
     def test_updating_an_activity(self):
         post_activity_data = self.post_an_activity()
