@@ -105,7 +105,7 @@ def create_app(config_name):
                             'message': 'Zero returns no buckets'
                         })
                         return make_response(response), 202
-                else: 
+                else:
                     list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
                     bucketlist_objects_list = []
 
@@ -231,6 +231,7 @@ def create_app(config_name):
                     return make_response(response), 400
             else:
                 search = request.args.get('q')
+                limit_to_return = request.args.get('limit')
                 if search:
                     activities_list = Activities.query.filter_by(bucket_id=bucket_id)
                     activity_array = []
@@ -252,6 +253,27 @@ def create_app(config_name):
                             'message': 'The activity name does not exist'
                         })    
                         return make_response(response), 202
+                elif limit_to_return:
+                    if int(limit_to_return)>0:
+                        activities_list = Activities.query.filter_by(bucket_id=bucket_id).limit(int(limit_to_return))
+                        activity_array = []
+                        for item in activities_list:
+                            activity_object = {
+                                'id': item.id,
+                                'activity_name': item.activity_name,
+                                'date_created': item.date_created,
+                                'date_modified': item.date_modified,
+                                'bucket_id': item.bucket_id
+                            }
+                            activity_array.append(activity_object)
+                        response = jsonify(activity_array)
+                        return make_response(response), 200
+                    else:
+                        response = jsonify({
+                            'message': 'Zero returns no item'
+                        })
+                        return make_response(response), 202                    
+
                 else:
                     activitieslist = Activities.query.filter_by(bucket_id=bucket_id)
                     activity_array = []
