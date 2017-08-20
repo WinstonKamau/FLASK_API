@@ -65,5 +65,59 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         self.assertEqual(result['message'], 'Wrong password entered for the user user1@gmail.com !')
         self.assertEqual(result_of_post_method.status_code, 401)
 
-    
+    def test_reset_password(self):
+        result_of_post_method = self.client().post('/auth/register', data=self.information)
+        self.assertEqual(result_of_post_method.status_code, 201)
+        result_of_login = self.client().post('/auth/login', data=self.information)
+        self.assertEqual(result_of_login.status_code, 200)
+        token = json.loads(result_of_login.data.decode())['access-token']
+        reset_data = {
+            'user_password':'password',
+            'new_password':'new_test_password',
+            'verify_new_password': 'new_test_password'
+        } 
+        result_of_post_method = self.client().post('auth/reset-password',
+                                                  headers=dict(Authorization='Bearer '+ token),
+                                                  data=reset_data
+                                                  )
+        
+        self.assertEqual(result_of_post_method.status_code, 201)
+        self.assertIn('Password reset', str(result_of_post_method.data))
 
+    def test_reset_password_sad_path(self):
+        result_of_post_method = self.client().post('/auth/register', data=self.information)
+        self.assertEqual(result_of_post_method.status_code, 201)
+        result_of_login = self.client().post('/auth/login', data=self.information)
+        self.assertEqual(result_of_login.status_code, 200)
+        token = json.loads(result_of_login.data.decode())['access-token']
+        reset_data = {
+            'user_password':'wrongpassword',
+            'new_password':'new_test_password',
+            'verify_new_password': 'new_test_password'
+        } 
+        result_of_post_method = self.client().post('auth/reset-password',
+                                                  headers=dict(Authorization='Bearer '+ token),
+                                                  data=reset_data
+                                                  )
+        
+        self.assertEqual(result_of_post_method.status_code, 400)
+        self.assertIn('Wrong password entered', str(result_of_post_method.data))
+
+    def test_reset_password_sad_path_1(self):
+        result_of_post_method = self.client().post('/auth/register', data=self.information)
+        self.assertEqual(result_of_post_method.status_code, 201)
+        result_of_login = self.client().post('/auth/login', data=self.information)
+        self.assertEqual(result_of_login.status_code, 200)
+        token = json.loads(result_of_login.data.decode())['access-token']
+        reset_data = {
+            'user_password':'password',
+            'new_password':'new_test_password',
+            'verify_new_password': 'wrong_new_test_password'
+        } 
+        result_of_post_method = self.client().post('auth/reset-password',
+                                                  headers=dict(Authorization='Bearer '+ token),
+                                                  data=reset_data
+                                                  )
+        
+        self.assertEqual(result_of_post_method.status_code, 400)
+        self.assertIn('Passwords do not match', str(result_of_post_method.data))
