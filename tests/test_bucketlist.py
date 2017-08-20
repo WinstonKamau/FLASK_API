@@ -206,28 +206,6 @@ class TheBucketTestCase(unittest.TestCase):
         self.assertIn('Adventure', str(result_of_get_method.data))
         self.assertIn('Acts of Kindness', str(result_of_get_method.data))
 
-    def test_read_bucket_using_wrong_value(self):
-        post_data = self.post_a_bucket()
-        self.assertEqual(post_data.status_code, 201)
-        post_data_2 = self.client().post('/bucketlists/',
-                                        headers=dict(Authorization='Bearer '
-                                                    + self.register_login_and_return_token()),
-                                        data={"name": "Family"})
-        post_data_3 = self.client().post('/bucketlists/',
-                                        headers=dict(Authorization='Bearer '
-                                                    + self.register_login_and_return_token()),
-                                        data={"name": "Travel"})
-        post_data_4 = self.client().post('/bucketlists/',
-                                        headers=dict(Authorization='Bearer '
-                                                    + self.register_login_and_return_token()),
-                                        data={"name": "Adventure"})
-        result_of_get_method = self.client().get('/bucketlists/?m=7',
-                                                 headers=dict(Authorization='Bearer '
-                                                    + self.register_login_and_return_token())
-                                                )
-        self.assertEqual(result_of_get_method.status_code, 200)
-        self.assertIn('Wrong value entered', str(result_of_get_method.data))
-
     def test_edit_bucketlist(self):
         """A method to test the editing of a bucket list"""
         post_data = self.post_a_bucket()
