@@ -68,7 +68,7 @@ def create_app(config_name):
                     bucketlist_list = BucketList.query.filter_by(creator_id = user_id) 
                     buckets = []
                     for item in bucketlist_list:
-                        if item.name.lower() == bucket_name_to_search.lower():
+                        if bucket_name_to_search.lower() in item.name.lower():
                             a_bucket_object = {
                                             'id': item.id,
                                             'name': item.name,
@@ -236,7 +236,7 @@ def create_app(config_name):
                     activities_list = Activities.query.filter_by(bucket_id=bucket_id)
                     activity_array = []
                     for item in activities_list:
-                        if item.activity_name.lower() == search.lower():
+                        if search.lower() in item.activity_name.lower():
                             activity_object = {
                                 'id': item.id,
                                 'activity_name': item.activity_name,
