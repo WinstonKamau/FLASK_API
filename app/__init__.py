@@ -25,109 +25,122 @@ def create_app(config_name):
     @app.route('/bucketlists/', methods=['POST', 'GET'])
     def bucketlists():
         '''a method that will save a bucket list if post is chosen, return
-        a bucketlist if GET is chosen, the bucket list returned can be
+        a bucketlist if GET is chosen, the buckest list returned can be
         thinned down by an id'''
         header = request.headers.get('Authorization')
-        splitted_header = header.split(' ')
-        token = splitted_header[1]
-        user_id = User.decode_token_to_sub(token)
-        if not isinstance(user_id, str):
-            if request.method == "POST":
-                name = str(request.data.get('name', ''))
-                status_of_similarity = False
-                if name:
-                    bucketlists_to_be_checked = BucketList.query.filter_by(creator_id=user_id)
-                    for item in bucketlists_to_be_checked:
-                        if name.lower() == item.name.lower():
-                            status_of_similarity = True     
-                    if status_of_similarity == False:
-                        bucket_object = BucketList(name=name, creator_id=user_id)
-                        bucket_object.save_bucket()
-                        response = jsonify({
-                            'id': bucket_object.id,
-                            'name': bucket_object.name,
-                            'date_created': bucket_object.date_created,
-                            'date_modified': bucket_object.date_modified,
-                            'creator_id': user_id
-                        })
-                        return make_response(response), 201
+        if header:
+            if ' ' in header:
+                splitted_header = header.split(' ')
+                token = splitted_header[1]
+                user_id = User.decode_token_to_sub(token)
+                if not isinstance(user_id, str):
+                    if request.method == "POST":
+                        name = str(request.data.get('name', ''))
+                        status_of_similarity = False
+                        if name:
+                            bucketlists_to_be_checked = BucketList.query.filter_by(creator_id=user_id)
+                            for item in bucketlists_to_be_checked:
+                                if name.lower() == item.name.lower():
+                                    status_of_similarity = True     
+                            if status_of_similarity == False:
+                                bucket_object = BucketList(name=name, creator_id=user_id)
+                                bucket_object.save_bucket()
+                                response = jsonify({
+                                    'id': bucket_object.id,
+                                    'name': bucket_object.name,
+                                    'date_created': bucket_object.date_created,
+                                    'date_modified': bucket_object.date_modified,
+                                    'creator_id': user_id
+                                })
+                                return make_response(response), 201
+                            else:
+                                response = jsonify ({
+                                    'message': 'A bucket list exists with a similar name of {}!'.format(name)
+                                })
+                                return make_response(response), 202
+                        else:
+                            response = jsonify ({
+                                'message': 'The key variable name has not been entered!'
+                            })
+                            return make_response(response), 400
                     else:
-                        response = jsonify ({
-                            'message': 'A bucket list exists with a similar name of {}!'.format(name)
-                        })
-                        return make_response(response), 202
+                        bucket_name_to_search = request.args.get('q')
+                        limit_to_return = request.args.get('limit')
+                        if bucket_name_to_search:
+                            bucketlist_list = BucketList.query.filter_by(creator_id = user_id) 
+                            buckets = []
+                            for item in bucketlist_list:
+                                if bucket_name_to_search.lower() in item.name.lower():
+                                    a_bucket_object = {
+                                                    'id': item.id,
+                                                    'name': item.name,
+                                                    'date_created': item.date_created,
+                                                    'date_modified': item.date_modified,
+                                                    'creator_id': item.creator_id
+                                                }
+                                    buckets.append(a_bucket_object)
+                            if len(buckets) > 0 :
+                                response = jsonify (buckets)    
+                                return make_response(response), 200
+                            else:
+                                response = jsonify({
+                                    'message': 'Name does not exist',
+                                    'jkjk': request.args.get()
+                                })
+                                return make_response(response), 202
+                        elif limit_to_return:
+                            if int(limit_to_return) > 0:
+                                bucketlist_list = BucketList.query.filter_by(creator_id = user_id).limit(int (limit_to_return))
+                                buckets = []
+                                for item in bucketlist_list:
+                                    a_bucket_object = {
+                                        'id': item.id,
+                                        'name': item.name,
+                                        'date_created': item.date_created,
+                                        'date_modified': item.date_modified,
+                                        'creator_id': item.creator_id
+                                    }
+                                    buckets.append(a_bucket_object)
+                                response = jsonify(buckets)
+                                return make_response(response), 200
+                            else:
+                                response = jsonify({
+                                    'message': 'Zero returns no buckets'
+                                })
+                                return make_response(response), 202
+                        else:
+                            list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
+                            bucketlist_objects_list = []
+
+                            for item in list_of_bucketlist:
+                                a_bucket_object = {
+                                                    'id': item.id,
+                                                    'name': item.name,
+                                                    'date_created': item.date_created,
+                                                    'date_modified': item.date_modified,
+                                                    'creator_id': item.creator_id
+                                }
+                                bucketlist_objects_list.append(a_bucket_object)
+                            #converting the bucket list objec into JSON
+                            response = jsonify(bucketlist_objects_list)
+                            return make_response(response), 200
                 else:
-                    response = jsonify ({
-                        'message': 'The key variable name has not been entered!'
-                    })
-                    return make_response(response), 400
+                    response = {
+                        'message': 'User id is a string',
+                        'userid': user_id
+                    }
+                    return make_response(jsonify(response)), 401
             else:
-                bucket_name_to_search = request.args.get('q')
-                limit_to_return = request.args.get('limit')
-                if bucket_name_to_search:
-                    bucketlist_list = BucketList.query.filter_by(creator_id = user_id) 
-                    buckets = []
-                    for item in bucketlist_list:
-                        if bucket_name_to_search.lower() in item.name.lower():
-                            a_bucket_object = {
-                                            'id': item.id,
-                                            'name': item.name,
-                                            'date_created': item.date_created,
-                                            'date_modified': item.date_modified,
-                                            'creator_id': item.creator_id
-                                        }
-                            buckets.append(a_bucket_object)
-                    if len(buckets) > 0 :
-                        response = jsonify (buckets)    
-                        return make_response(response), 200
-                    else:
-                        response = jsonify({
-                            'message': 'Name does not exist'
-                        })
-                        return make_response(response), 202
-                elif limit_to_return:
-                    if int(limit_to_return) > 0:
-                        bucketlist_list = BucketList.query.filter_by(creator_id = user_id).limit(int (limit_to_return))
-                        buckets = []
-                        for item in bucketlist_list:
-                            a_bucket_object = {
-                                'id': item.id,
-                                'name': item.name,
-                                'date_created': item.date_created,
-                                'date_modified': item.date_modified,
-                                'creator_id': item.creator_id
-                            }
-                            buckets.append(a_bucket_object)
-                        response = jsonify(buckets)
-                        return make_response(response), 200
-                    else:
-                        response = jsonify({
-                            'message': 'Zero returns no buckets'
-                        })
-                        return make_response(response), 202
-                else:
-                    list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
-                    bucketlist_objects_list = []
-
-                    for item in list_of_bucketlist:
-                        a_bucket_object = {
-                                            'id': item.id,
-                                            'name': item.name,
-                                            'date_created': item.date_created,
-                                            'date_modified': item.date_modified,
-                                            'creator_id': item.creator_id
-                        }
-                        bucketlist_objects_list.append(a_bucket_object)
-                    #converting the bucket list objec into JSON
-                    response = jsonify(bucketlist_objects_list)
-                    return make_response(response), 200
+                response = ({
+                    'message': 'The authorisation header should have a space between the Bearer and the token'
+                })
+                return make_response(response), 400
         else:
-            response = {
-                'message': 'User id is a string',
-                'userid': user_id
-            }
-            return make_response(jsonify(response)), 401
-
+            response = jsonify({
+                'message': 'No authorisation header given'
+            })
+            return make_response(response), 401
+            
     @app.route('/bucketlists/<int:id>', methods=['GET', 'PUT', 'DELETE'])
     def bucketlist_manipulation(id, **kwargs):
         '''a method that accepts a variable on its route and converts it into an integer
