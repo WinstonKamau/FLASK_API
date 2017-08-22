@@ -32,7 +32,7 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         result_of_post_method_2 = self.client().post('/auth/register', data=self.information)
         result = json.loads(result_of_post_method_2.data.decode())
         self.assertEqual(result['message'], 'The user email entered already exists!')
-        self.assertEqual(result_of_post_method_2.status_code, 202)
+        self.assertEqual(result_of_post_method_2.status_code, 409)
 
     def test_the_user_login(self):
         result_of_post_method = self.client().post('/auth/register', data=self.information)
@@ -50,7 +50,7 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         }
         result_of_post_method = self.client().post('/auth/login', data=user_data)
         result = json.loads(result_of_post_method.data.decode())
-        self.assertEqual(result['message'], 'Username does not exist! Register or check the username entered again.')
+        self.assertEqual(result['message'], 'User email does not exist! Register or check the user email entered again.')
         self.assertEqual(result_of_post_method.status_code, 401)
 
     def test_registered_user_with_wrong_password(self):
@@ -120,4 +120,4 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
                                                   )
         
         self.assertEqual(result_of_post_method.status_code, 400)
-        self.assertIn('Passwords do not match', str(result_of_post_method.data))
+        self.assertIn('New password and verify new password do not match', str(result_of_post_method.data))
