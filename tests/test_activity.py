@@ -70,7 +70,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                                   + self.register_login_and_return_token()
                                                                   ),
                                                      data=self.activity)
-        self.assertEqual(post_activity_data_second_time.status_code, 202)
+        self.assertEqual(post_activity_data_second_time.status_code, 409)
 
 
     def test_getting_all_activitites(self):
@@ -223,11 +223,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                         headers=dict(Authorization='Bearer '
                                                         + self.register_login_and_return_token())
                                                         )
-        self.assertEqual(result_of_delete_activity_2.status_code, 404)
-
-    
-
-
+        self.assertEqual(result_of_delete_activity_2.status_code, 400)
 
     def tearDown(self):
         '''A method for removing all set variables and deleting our database'''
