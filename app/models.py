@@ -1,7 +1,7 @@
 import os
 
 import jwt
-from flask import current_app
+from flask import current_app, jsonify, make_response
 from flask_bcrypt import Bcrypt
 from app import db
 from datetime import datetime, timedelta
@@ -59,13 +59,14 @@ class User(db.Model):
     @staticmethod    
     def decode_token_to_sub(token_received):
         try:
-            payload = jwt.decode(token_received, current_app.config.get('SECRET'))
+            splitted_header = token_received.split(' ')
+            token = splitted_header[1]
+            payload = jwt.decode(token, current_app.config.get('SECRET'))
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return "10 minutes passed, your token has expired"
         except jwt.InvalidTokenError:
             return 'Register and login to allow valid token'
-
     
     def password_confirm(self, user_password):
         '''A method for comparing the password entered to the password already stored in hash
