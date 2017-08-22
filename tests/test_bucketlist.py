@@ -236,7 +236,7 @@ class TheBucketTestCase(unittest.TestCase):
             data={
                 "name": "Climb the Himalayas"
             })
-        self.assertEqual(result_of_put_method.status_code, 202)
+        self.assertEqual(result_of_put_method.status_code, 409)
 
     def test_delete_bucketlist(self):
         """A method to test the deleting of a bucket list"""
@@ -251,7 +251,7 @@ class TheBucketTestCase(unittest.TestCase):
                                                    headers=dict(Authorization='Bearer '
                                                                 + self.register_login_and_return_token())
                                                   )
-        self.assertEqual(response_after_removal.status_code, 404)
+        self.assertEqual(response_after_removal.status_code, 400)
 
     def tearDown(self):
         '''A method for removing all set variables and deleting our database'''
