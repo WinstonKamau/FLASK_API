@@ -143,6 +143,15 @@ class ResetPassword(MethodView):
             })
             return make_response (response), 201                               
 
+class Logout(MethodView):
+    def get(self):
+        '''A method to delete the token on the client's browser needs to be added
+        and the response below given
+        '''
+        response = jsonify({
+            'message': 'Logged out'
+        })
+        return make_response(response), 200
 
 view_for_registration = Registration.as_view('register_view')
 
@@ -165,4 +174,12 @@ registration_login_blueprint.add_url_rule(
     '/auth/reset-password',
     view_func=view_for_reset_password,
     methods=['POST']
+)
+
+view_for_logout = Logout.as_view('logout_view')
+
+registration_login_blueprint.add_url_rule(
+    '/auth/logout',
+    view_func=view_for_logout,
+    methods=['GET']
 )
