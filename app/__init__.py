@@ -38,7 +38,7 @@ def create_app(config_name):
                 'message2': 'The authorization should be typed as the example below',
                 'example': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MDMzNDUzMjIsInN1YiI6MiwiaWF0IjoxNTAzMzQxNzIyfQ.fCZ3ibX-vHQ5SKxYbrarQ0I8lvq5TgMt03A5vGlGhDE"'
             })
-            return make_response(response), 400
+            return make_response(response), 401
         user_id = User.decode_token_to_sub(header)
         if not isinstance (user_id, int):
             response = {
@@ -75,7 +75,7 @@ def create_app(config_name):
                 response = jsonify ({
                     'message': 'A bucket list exists with a similar name of {}!'.format(name)
                 })
-                return make_response(response), 202
+                return make_response(response), 409
                 
         else:
             bucket_name_to_search = request.args.get('q')
@@ -106,7 +106,7 @@ def create_app(config_name):
                     response = jsonify({
                         'message': 'Name does not exist',
                     })
-                    return make_response(response), 202
+                    return make_response(response), 200
             elif limit_to_return:
                 if int(limit_to_return) > 0:
                     bucketlist_list = BucketList.query.filter_by(creator_id=user_id).limit(int (limit_to_return))
@@ -122,11 +122,16 @@ def create_app(config_name):
                         buckets.append(a_bucket_object)
                     response = jsonify(buckets)
                     return make_response(response), 200
-                else:
+                elif int(limit_to_return) == 0:
                     response = jsonify({
                         'message': 'Zero returns no buckets'
                     })
-                    return make_response(response), 202
+                    return make_response(response), 200
+                else:
+                    response = jsonify({
+                        'message': 'The value entered on limit is not suitable'
+                    })
+                    return make_response(response), 400
             elif len(no_argument_given) == 0:
                 list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
                 bucketlist_objects_list = []
@@ -169,7 +174,7 @@ def create_app(config_name):
                 'message2': 'The authorization should be typed as the example below',
                 'example': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MDMzNDUzMjIsInN1YiI6MiwiaWF0IjoxNTAzMzQxNzIyfQ.fCZ3ibX-vHQ5SKxYbrarQ0I8lvq5TgMt03A5vGlGhDE"'
             })
-            return make_response(response), 400
+            return make_response(response), 401
         user_id = User.decode_token_to_sub(header)
         if not isinstance (user_id, int):
             response = {
@@ -212,7 +217,7 @@ def create_app(config_name):
                         'date_modified': bucket_object.date_modified,
                         'creator_id': bucket_object.creator_id
                     })
-                    return make_response(response), 200
+                    return make_response(response), 201
                 else:
                     response = jsonify ({
                         'message': 'A bucket list exists with a similar name of {}!'.format(name)
@@ -243,7 +248,7 @@ def create_app(config_name):
                 'message2': 'The authorization should be typed as the example below',
                 'example': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MDMzNDUzMjIsInN1YiI6MiwiaWF0IjoxNTAzMzQxNzIyfQ.fCZ3ibX-vHQ5SKxYbrarQ0I8lvq5TgMt03A5vGlGhDE"'
             })
-            return make_response(response), 400
+            return make_response(response), 401
         user_id = User.decode_token_to_sub(header)
         if not isinstance (user_id, int):
             response = {
@@ -314,7 +319,7 @@ def create_app(config_name):
                     response = jsonify({
                         'message': 'The activity name does not exist'
                     })    
-                    return make_response(response), 202
+                    return make_response(response), 200
             elif limit_to_return:
                 if int(limit_to_return)>0:
                     activities_list = Activities.query.filter_by(bucket_id=bucket_id).limit(int(limit_to_return))
@@ -334,7 +339,7 @@ def create_app(config_name):
                     response = jsonify({
                         'message': 'Zero returns no item'
                     })
-                    return make_response(response), 202                    
+                    return make_response(response), 200                    
 
             elif len(no_argument_given) == 0 :
                 activitieslist = Activities.query.filter_by(bucket_id=bucket_id)
@@ -374,7 +379,7 @@ def create_app(config_name):
                 'message2': 'The authorization should be typed as the example below',
                 'example': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MDMzNDUzMjIsInN1YiI6MiwiaWF0IjoxNTAzMzQxNzIyfQ.fCZ3ibX-vHQ5SKxYbrarQ0I8lvq5TgMt03A5vGlGhDE"'
             })
-            return make_response(response), 400
+            return make_response(response), 401
         user_id = User.decode_token_to_sub(header)
         if not isinstance (user_id, int):
             response = {
@@ -395,33 +400,33 @@ def create_app(config_name):
             return make_response(response), 400
         if request.method == 'PUT':
             activity_name = request.data['activity_name']
-            if activity_name:
-                activities_to_be_checked = Activities.query.filter_by(bucket_id=bucket_id)
-                status_of_similarity = False
-                for item in activities_to_be_checked:
-                    if activity_name.lower() == item.activity_name.lower():
-                        status_of_similarity = True
-                if status_of_similarity == False:
-                    activity_object.activity_name = activity_name
-                    activity_object.save_activity()
-                    response = jsonify ({
-                        'id': activity_object.id,
-                        'date_created': activity_object.date_created,
-                        'date_modified': activity_object.date_modified,
-                        'bucket_id': activity_object.bucket_id,
-                        'activity_name': activity_object.activity_name
-                    })
-                    return make_response(response), 200
-                else:
-                    response = jsonify({
-                        'message': "An activity already exists with the name {} provided.".format(activity_name)
-                    })
-                    return make_response(response), 202
-            else:
+            if not activity_name:
                 response = jsonify({
                     'message': 'No key of activity_name was used in replacing'
                 }) 
                 return make_respons(response), 400
+            activities_to_be_checked = Activities.query.filter_by(bucket_id=bucket_id)
+            status_of_similarity = False
+            for item in activities_to_be_checked:
+                if activity_name.lower() == item.activity_name.lower():
+                    status_of_similarity = True
+            if status_of_similarity == False:
+                activity_object.activity_name = activity_name
+                activity_object.save_activity()
+                response = jsonify ({
+                    'id': activity_object.id,
+                    'date_created': activity_object.date_created,
+                    'date_modified': activity_object.date_modified,
+                    'bucket_id': activity_object.bucket_id,
+                    'activity_name': activity_object.activity_name
+                })
+                return make_response(response), 200
+            else:
+                response = jsonify({
+                    'message': "An activity already exists with the name {} provided.".format(activity_name)
+                })
+                return make_response(response), 409
+                
         if request.method == 'DELETE':
             response = jsonify({
                 'message': "Deleted activity {}".format(activity_object.id)
