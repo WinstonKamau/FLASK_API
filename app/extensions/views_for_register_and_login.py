@@ -144,7 +144,7 @@ class ResetPassword(MethodView):
             return make_response (response), 201                               
 
 class Logout(MethodView):
-    def get(self):
+    def post(self):
         '''A method to delete the token on the client's browser needs to be added
         and the response below given
         '''
@@ -181,5 +181,5 @@ view_for_logout = Logout.as_view('logout_view')
 registration_login_blueprint.add_url_rule(
     '/auth/logout',
     view_func=view_for_logout,
-    methods=['GET']
+    methods=['POST']
 )
