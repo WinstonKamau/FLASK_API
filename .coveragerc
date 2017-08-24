@@ -1,0 +1,17 @@
+[report]
+omit=
+    *site-packages/*
+    *asyncio/*
+    *concurrent/*
+    *ctypes/*
+    *html/*
+    *multiprocessing/*
+    *decimal*
+    *hmac*
+    *mimetypes*
+    *numbers*
+    *uuid*
+    *encodings/*
+    *http/*
+    *pydoc*
+    *stringprep*
