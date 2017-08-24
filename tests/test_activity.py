@@ -137,7 +137,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                                   + self.register_login_and_return_token()
                                                                   )
                                                   )
-        self.assertEqual(result_of_get_activity.status_code, 202)
+        self.assertEqual(result_of_get_activity.status_code, 200)
         self.assertIn('The activity name does not exist', str(result_of_get_activity.data))
 
     def test_getting_activity_using_limit(self):
@@ -179,7 +179,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                                   + self.register_login_and_return_token()
                                                                   )
                                                   )
-        self.assertEqual(result_of_get_activity_1.status_code, 202)
+        self.assertEqual(result_of_get_activity_1.status_code, 200)
         self.assertNotIn('Climb the Himalayas', str(result_of_get_activity_1.data))
         self.assertNotIn('Climb Mt. Kilimanjaro', str(result_of_get_activity_1.data))
         self.assertNotIn('Climb the Alps', str(result_of_get_activity_1.data))
