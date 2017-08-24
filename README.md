@@ -11,8 +11,20 @@ Flask Api is a restful api that serves clients by allowing them to create, read,
 - The flask api allows users to create, retrieve and manipulate buckets
 - The flask api allows a user to create, retrieve and manipulate activities
 
+#Technologies used
+- Python3
+- Flask
+- Postgresql
 # Setup
+-Create a folder that will host the project
+-Clone https://github.com/WinstonKamau/FLASK_API.git
+-Ensure that you are working in a virtual environment. <pip install virtualenv>
+-Set you database url to link to your postgresql account. "postgresql://localhost/flask_api" if you have a password ensure that the link above delivers the username and password. e.g. "postgresql://username:password@localhost/flask_api"
+-set FLASK_APP to run.py
+-set SECRET to any string you'd like e.g "Any string"
+-set APP_SETTINGS to "development"
+-Install the requirements on the requirements.txt file
+-Create a migrations folder by running python migrate db init
+-Migrate the migrations by running python migrate db migrate
+-Run python migrate db upgrade to persist migrations
 
-Ensure that you are working in a virtual environment
-Install flask,flask-sqlalchemy psycopg2 flask-migrate, FLASK_API, flask_script, flask_bycrypt
-SQLALCHEMy database
