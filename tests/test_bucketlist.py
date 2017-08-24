@@ -66,7 +66,7 @@ class TheBucketTestCase(unittest.TestCase):
         post_data = self.post_a_bucket()
         self.assertEqual(post_data.status_code, 201)
         post_data_second_time = self.post_a_bucket()
-        self.assertEqual(post_data_second_time.status_code, 202)
+        self.assertEqual(post_data_second_time.status_code, 409)
         self.assertIn('A bucket list exists with a similar name of', str(post_data_second_time.data))
 
     def test_read_bucket(self):
@@ -117,7 +117,7 @@ class TheBucketTestCase(unittest.TestCase):
                                                 headers=dict(Authorization='Bearer '
                                                     + self.register_login_and_return_token())
                                                 )   
-        self.assertEqual(result_of_get_method.status_code, 202)
+        self.assertEqual(result_of_get_method.status_code, 200)
         self.assertIn('Name does not exist', str(result_of_get_method.data))
 
     def test_read_bucket_using_limit(self):
@@ -173,7 +173,7 @@ class TheBucketTestCase(unittest.TestCase):
                                                  headers=dict(Authorization='Bearer '
                                                     + self.register_login_and_return_token())
                                                 )
-        self.assertEqual(result_of_get_method.status_code, 202)
+        self.assertEqual(result_of_get_method.status_code, 200)
         self.assertIn('Zero returns no buckets', str(result_of_get_method.data))
 
     def test_read_bucket_using_limit_sad_path_2(self):
@@ -218,7 +218,7 @@ class TheBucketTestCase(unittest.TestCase):
             data={
                 "name": "The seasons will be, summer winter and autumn"
             })
-        self.assertEqual(result_of_put_method.status_code, 200)
+        self.assertEqual(result_of_put_method.status_code, 201)
         result_of_get_method = self.client().get('/bucketlists/1',
                                                  headers=dict(Authorization='Bearer '
                                                               + self.register_login_and_return_token())
