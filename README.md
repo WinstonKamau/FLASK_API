@@ -33,31 +33,31 @@ Flask Api is a restful api that serves clients by allowing them to create, read,
 -Run the app using `python run.py `
 
 #API ENDPOINTS
-**ENDPOINT** | **Public Access**|
+**ENDPOINT** | **Public Access**
 ---------------------------------
-POST /auth/register | True|
+POST /auth/register | True
 ---------------------------
-POST /auth/login | True|
+POST /auth/login | True
 ------------------------
-POST /auth/reset-password |True|
+POST /auth/reset-password |True
 --------------------------------
-POST /auth/logout |True|
+POST /auth/logout |True
 ------------------------
-POST /bucketlists/|False|
+POST /bucketlists/|False
 -------------------------
-GET /bucketlists/|False|
+GET /bucketlists/|False
 ------------------------
-GET /bucketlists/<id> | False|
+GET /bucketlists/<id> | False
 -----------------------------
-PUT /bucketlists/<id>| False|
+PUT /bucketlists/<id>| False
 -----------------------------
-DELETE /bucketlists/<id> | False|
+DELETE /bucketlists/<id> | False
 ---------------------------------
-POST /bucketlsits/<id>/items/ | False |
+POST /bucketlsits/<id>/items/ | False 
 ---------------------------------------------
-PUT /bucketlists/<id>/items/<item_id>| False|
+PUT /bucketlists/<id>/items/<item_id>| False
 ---------------------------------------------
-DELETE /bucketlists/<id>/items/<item_id>| False|
+DELETE /bucketlists/<id>/items/<item_id>| False
 ------------------------------------------------
 
 
