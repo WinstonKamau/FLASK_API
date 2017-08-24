@@ -97,13 +97,13 @@ class ResetPassword(MethodView):
                 'message2': 'The authorization should be typed as the example below',
                 'example': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MDMzNDUzMjIsInN1YiI6MiwiaWF0IjoxNTAzMzQxNzIyfQ.fCZ3ibX-vHQ5SKxYbrarQ0I8lvq5TgMt03A5vGlGhDE"'
             })
-            return make_response(response), 400
+            return make_response(response), 401
         user_id = User.decode_token_to_sub(header)
         if not isinstance(user_id, int):
             response = jsonify({
                     'message': 'Invalid token entered'
                 })
-            return make_response(response), 400
+            return make_response(response), 401
         if 'user_password' not in request.data.keys():
             response = jsonify({
                 'message': "To reset password the variable 'user_password' for the current password needs to be inserted"
