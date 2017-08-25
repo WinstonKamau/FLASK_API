@@ -4,6 +4,10 @@ python:
 # command to install dependencies
 services:
   - postgresql
+env:
+  global:
+    SECRET=my-strings-for-setting-secret
+    DATABASE_URL=postgresql://postgres:winston77@localhost/flask_api
 
 # command to install dependencies
 install:
