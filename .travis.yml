@@ -15,7 +15,6 @@ install:
   - pip install coveralls --quiet
 # command to run tests
 script: 
--nosetests/tests
 -nosetests --with-coverage --cover-package=app
 
 after_success: coveralls
