@@ -5,10 +5,10 @@ python:
 services: postgresql
 env:
   global: 
-    - SECRET=mysecretword
+    - SECRET=my-strings-for-setting-secret
+    - DATABASE_URL=postgresql://postgres:@localhost/new_test_db
 before_script:
   - psql -c 'create database new_test_db;' -U postgres
-  - psql -c "ALTER USER "postgres" WITH PASSWORD 'winston77';" -U postgres
 # command to install dependencies
 install:
   - pip install -r requirements.txt
