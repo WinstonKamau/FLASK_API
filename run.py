@@ -1,3 +1,4 @@
+'''Module for running the bucketlist flask api'''
 import os
 from app import create_app
 
