@@ -2,21 +2,13 @@ language: python
 python:
   - "3.6"
 # command to install dependencies
-services:
-  - postgresql
-env:
-  global:
-    SECRET=my-strings-for-setting-secret
-    DATABASE_URL=postgresql://postgres:winston77@localhost/flask_api
+services: postgresql
+before_script: createdb database_test
 
 # command to install dependencies
 install:
   - pip install -r requirements.txt
   - pip install coveralls --quiet
-
-before_script:
-  - createdb test_db
-
 # command to run tests
 script: nosetests --with-coverage
 after_success: coveralls
