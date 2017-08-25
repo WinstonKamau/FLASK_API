@@ -208,7 +208,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                          + self.register_login_and_return_token()),
                                          data=update_activity
                                          )
-        self.assertEqual(result_of_put.status_code, 202)
+        self.assertEqual(result_of_put.status_code, 409)
 
 
     def test_deleting_an_activity(self):
