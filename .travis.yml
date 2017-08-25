@@ -14,5 +14,5 @@ install:
   - pip install -r requirements.txt
   - pip install coveralls --quiet
 # command to run tests
-script: nosetests --with-coverage
+script: nosetests/tests
 after_success: coveralls
