@@ -17,4 +17,6 @@ install:
 script: 
   - pytest
   - nosetests --with-coverage
-after_success: coveralls
+after_success: 
+  - coveralls
+  - coverage report
