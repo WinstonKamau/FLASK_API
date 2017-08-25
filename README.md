@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/WinstonKamau/FLASK_API.svg?branch=master)](https://travis-ci.org/WinstonKamau/FLASK_API)
+
+[![Coverage Status](https://coveralls.io/repos/github/WinstonKamau/FLASK_API/badge.svg?branch=master)](https://coveralls.io/github/WinstonKamau/FLASK_API?branch=master)
 # FLASK_API
 Flask Api is a restful api that serves clients by allowing them to create, read, update and delete buckets as well as activities within their buckets. By buckets we refer to a larger class category of things clients would love to do in their lives before they die for example 'Travelling'. By activities/items we refer to a more detail explanation of the bucket, search as 'Travel to Morrocco and visit the formula E arena'
 
