@@ -2,12 +2,17 @@ language: python
 python:
   - "3.6"
 # command to install dependencies
+services:
+  - postgresql
+
+# command to install dependencies
 install:
   - pip install -r requirements.txt
-  - pip install coveralls
+  - pip install coveralls --quiet
+
+before_script:
+  - createdb test_db
+
 # command to run tests
-script: 
- - nosetests --with-coverage 
-after_success: 
- - coveralls
- - coverage report
+script: coverage run --source=app ./manage.py test
+after_success: coveralls
