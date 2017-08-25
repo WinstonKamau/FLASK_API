@@ -9,7 +9,7 @@ before_script:
 env:
   global:
     - DATABASE_URL=postgresql://postgres:winston77@localhost/test_db
-    - SECRET_KEY= asdjfksdakfjlasdfkwerefrewfoweo
+    - SECRET= asdjfksdakfjlasdfkwerefrewfoweo
 install:
   - pip install -r requirements.txt
   - pip install coveralls
