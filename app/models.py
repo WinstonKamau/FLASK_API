@@ -1,13 +1,19 @@
+'''A module for communicating with the database that creates tables for
+users, bucketlists and activities'''
 import os
 
+from datetime import datetime, timedelta
 import jwt
-from flask import current_app, jsonify, make_response
+from flask import current_app
 from flask_bcrypt import Bcrypt
 from app import db
-from datetime import datetime, timedelta
+
 
 
 class User(db.Model):
+    '''A class that creates an instance of a user , saves, deletes and
+    modifies it into tables that store the data
+    '''
     #table for users
     __usertable__ = 'users'
     #id for a user
@@ -16,11 +22,13 @@ class User(db.Model):
     #Unique is set to True as two users cannot have the same email
     user_email = db.Column(db.String(300), nullable=False, unique=True)
     user_password = db.Column(db.String(300), nullable=False)
-    bucketlists = db.relationship('BucketList', order_by='BucketList.id', cascade='all, delete-orphan')
+    bucketlists = db.relationship('BucketList',
+                                  order_by='BucketList.id',
+                                  cascade='all, delete-orphan')
 
     def __init__(self, user_email, user_password):
         '''A method for initialising the user with an email and a password that has been hashed
-        inorder to prevent storing password in plain text which could be accessed through brute 
+        inorder to prevent storing password in plain text which could be accessed through brute
         force approaches
         '''
         self.user_email = user_email
@@ -33,7 +41,8 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def create_encoded_token(self, user_id):
+    @staticmethod
+    def create_encoded_token(user_id):
         '''A method to create a token based on the id of the user and encode it to send
         to the clients server
         '''
@@ -45,19 +54,21 @@ class User(db.Model):
                 'iat': datetime.utcnow()
             }
             #Creating a json web token encoded with the algorithm HMAC SHA-256 algorithm
-            json_web_token = jwt.encode(
-                            payload,
-                            current_app.config.get('SECRET'),
-                            algorithm='HS256' 
-                            )
+            json_web_token = jwt.encode(payload,
+                                        current_app.config.get('SECRET'),
+                                        algorithm='HS256'
+                                       )
             return json_web_token
 
         except Exception as the_exception_generated:
             #A method to return any exception raised in the try block above
             return str(the_exception_generated)
 
-    @staticmethod    
+    @staticmethod
     def decode_token_to_sub(token_received):
+        '''A method for decoding the token provided back to a user id
+        that can be used to get information for the specific user
+        '''
         try:
             splitted_header = token_received.split(' ')
             token = splitted_header[1]
@@ -67,7 +78,7 @@ class User(db.Model):
             return "10 minutes passed, your token has expired"
         except jwt.InvalidTokenError:
             return 'Register and login to allow valid token'
-    
+
     def password_confirm(self, user_password):
         '''A method for comparing the password entered to the password already stored in hash
         format. The method returns True if the password match or False if they do not
@@ -76,16 +87,21 @@ class User(db.Model):
 
 
 class BucketList(db.Model):
+    '''A class that creates an instance of a bucket list, saves a bucketlist
+    deletes a bucket list and modifies bucket list to the database
+    '''
     #The table for the bucketlist with the variable name __buckettable__
     __buckettable__ = 'bucketlists'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    date_created = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
-                              onupdate = db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                              onupdate=db.func.current_timestamp())
     creator_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    activities = db.relationship('Activities', order_by='Activities.id', cascade='all, delete-orphan')
+    activities = db.relationship('Activities',
+                                 order_by='Activities.id',
+                                 cascade='all, delete-orphan')
 
     def __init__(self, name, creator_id):
         '''Initialising the bucket list with a name and the user's id'''
@@ -101,7 +117,7 @@ class BucketList(db.Model):
         '''A method to delete the bucket'''
         db.session.delete(self)
         db.session.commit()
-    
+
     @staticmethod
     def read_bucket(user_id):
         '''A method to return the bucket list in one query'''
@@ -113,14 +129,17 @@ class BucketList(db.Model):
 
 
 class Activities(db.Model):
-   #table for the activities with the activity name activities
-    __activitylist__="activities"
+    '''A class that creates an instance of an activity, saves an activity,
+    deletes an activity in the database
+    '''
+    #table for the activities with the activity name activities
+    __activitylist__ = "activities"
 
     id = db.Column(db.Integer, primary_key=True)
     activity_name = db.Column(db.String(300))
-    date_created = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default = db.func.current_timestamp(), 
-                              onupdate = db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
+                              onupdate=db.func.current_timestamp())
     bucket_id = db.Column(db.Integer, db.ForeignKey(BucketList.id))
 
 
@@ -128,12 +147,12 @@ class Activities(db.Model):
         '''initialising the activity name, user's and bucketlist's id'''
         self.activity_name = activity_name
         self.bucket_id = bucket_id
-    
+
     def save_activity(self):
         '''A method to save the activity name'''
         db.session.add(self)
         db.session.commit()
-    
+
     def delete_activity(self):
         '''A method to delete the activity name'''
         db.session.delete(self)
@@ -141,8 +160,9 @@ class Activities(db.Model):
 
     @staticmethod
     def read_activity(activity_id):
+        '''A method that reads an activity using its id'''
         return Activities.query.all(activity_id=activity_id)
-    
+
     def __repr__(self):
         '''A method that returns an object instance of Activity whenever it queries'''
         return "Activities: {}>".format(self.activity_name)
