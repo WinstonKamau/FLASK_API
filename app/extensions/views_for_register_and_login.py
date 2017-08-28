@@ -13,18 +13,20 @@ class Registration(MethodView):
         user_password_status = str(request.data.get('user_password', ''))
         if not user_email_status or not user_password_status:
             response = jsonify({
-                'message': "Key variables to be entered are supposed to be 'user_email' and 'user_password'"
+                'message': "Key variables to be entered are"
+                           "supposed to be 'user_email' and 'user_password'"
             })
             return make_response(response), 400
-        if not re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', request.data['user_email']):
+        if not re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$',
+                        request.data['user_email']):
             response = {
-                    'message': 'The user email entered is not valid ensure it has @ and .'
-                }
+                'message': 'The user email entered is not valid ensure it has @ and .'
+            }
             return make_response(jsonify(response)), 400
         if User.query.filter_by(user_email=request.data['user_email']).first():
             response = {
-                    'message':'The user email entered already exists!'
-                }
+                'message':'The user email entered already exists!'
+            }
             return make_response(jsonify(response)), 409
         else:
             user = User.query.filter_by(user_email=request.data['user_email']).first()
@@ -43,7 +45,6 @@ class Registration(MethodView):
                     'message': str(e)
                 }
                 return make_response(jsonify(response)), 401
-        
 
 class Login(MethodView):
     def post(self):
@@ -54,14 +55,16 @@ class Login(MethodView):
                 'message': "Key variables to be entered are supposed to be 'user_email' and 'user_password'"
             })
             return make_response(response), 400
-        if not re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', request.data['user_email']):
+        if not re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$',
+                        request.data['user_email']):
             response = {
-                    'message': 'The user email entered is not valid ensure it has @ and .'
-                }
+                'message': 'The user email entered is not valid ensure it has @ and .'
+            }
             return make_response(jsonify(response)), 400
         if not User.query.filter_by(user_email=request.data['user_email']).first():
             response = {
-                'message': 'User email does not exist! Register or check the user email entered again.'
+                'message': 'User email does not exist! Register or check the user email' 
+                           ' entered again.'
             }
             return make_response(jsonify(response)), 401
         else:
@@ -90,7 +93,7 @@ class ResetPassword(MethodView):
                 response = jsonify({
                     'message': 'No authorisation header given'
                 })
-                return make_response(response), 401    
+                return make_response(response), 401   
         if ' ' not in header:
             response= jsonify({
                 'message1': 'A space needs to exist between the Bearer and token.',
