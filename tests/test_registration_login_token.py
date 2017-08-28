@@ -31,14 +31,14 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         result_of_post_method = self.client().post('/auth/register', data=self.information)
         return result_of_post_method
 
-    def test_the_register_endpoint_function(self):
+    def test_register_endpoint(self):
         '''A happy path to test registration with right information'''
         post_result = self.register_one_user()
         result = json.loads(post_result.data.decode())
         self.assertIn("Email and password entered correctly", result['message'])
         self.assertEqual(post_result.status_code, 201)
 
-    def test_null_registration_of_users_with_same_info(self):
+    def test_similar_users(self):
         '''A method to test no registration when the user had been registered
         before
         '''
@@ -59,7 +59,7 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         self.assertNotEqual(result['access-token'], None)
         self.assertEqual(result_of_post_method.status_code, 200)
 
-    def test_non_registered_user_login_with_wrong_user_email(self):
+    def test_non_registereduser(self):
         '''A method to test that a user cannot login with a wrong email'''
         user_data = {
             'user_email':'unknown_email@gmail.com',
@@ -68,10 +68,11 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
         result_of_post_method = self.client().post('/auth/login', data=user_data)
         result = json.loads(result_of_post_method.data.decode())
         self.assertEqual(result['message'],
-                         'User email does not exist! Register or check the user email entered again.')
+                         'User email does not exist! Register or check the '
+                         'user email entered again.')
         self.assertEqual(result_of_post_method.status_code, 401)
 
-    def test_registered_user_with_wrong_password(self):
+    def test_wrong_password(self):
         '''A method to test that a user cannot login by inserting a wrong password
         to his email address that had been registered
         '''
@@ -101,8 +102,8 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
             'verify_new_password': 'new_test_password'
         }
         result_of_post_method = self.client().post('auth/reset-password',
-                                                  headers=dict(Authorization='Bearer '+ token),
-                                                  data=reset_data
+                                                   headers=dict(Authorization='Bearer '+ token),
+                                                   data=reset_data
                                                   )
 
         self.assertEqual(result_of_post_method.status_code, 201)
@@ -123,8 +124,8 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
             'verify_new_password': 'new_test_password'
         }
         result_of_post_method = self.client().post('auth/reset-password',
-                                                  headers=dict(Authorization='Bearer '+ token),
-                                                  data=reset_data
+                                                   headers=dict(Authorization='Bearer '+ token),
+                                                   data=reset_data
                                                   )
         self.assertEqual(result_of_post_method.status_code, 400)
         self.assertIn('Wrong password entered', str(result_of_post_method.data))
@@ -142,12 +143,11 @@ class RegistrationLoginTokenTestCase(unittest.TestCase):
             'user_password':'password',
             'new_password':'new_test_password',
             'verify_new_password': 'wrong_new_test_password'
-        } 
+            }
         result_of_post_method = self.client().post('auth/reset-password',
-                                                  headers=dict(Authorization='Bearer '+ token),
-                                                  data=reset_data
+                                                   headers=dict(Authorization='Bearer '+ token),
+                                                   data=reset_data
                                                   )
-        
         self.assertEqual(result_of_post_method.status_code, 400)
         self.assertIn('New password and verify new password do not match',
-                       str(result_of_post_method.data))
+                      str(result_of_post_method.data))
