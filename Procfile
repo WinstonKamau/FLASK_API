@@ -1,1 +1,1 @@
-web: python3 run.py -p $PORT
+web: python3 run.py
