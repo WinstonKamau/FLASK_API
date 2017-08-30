@@ -1,3 +1,5 @@
+'''A  module that is used in running migrations of the api automatically
+to the database allowing easy development'''
 import os
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -12,4 +14,3 @@ manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
     manager.run()
-    
