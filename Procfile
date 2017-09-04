@@ -1,1 +1,1 @@
-web: python3 run.py, swagger_documentation.py
+web: python3 swagger_documentation.py
