@@ -1,3 +1,4 @@
+
 '''A module that instantiates an app and harbors routes for bucketlists
 and activities'''
 from flask import request
@@ -7,6 +8,9 @@ from flask import make_response
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_configurations
+from flask_paginate import get_page_parameter
+import math
+
 db = SQLAlchemy()
 #The import below has to appear after initialisation of db to SQLAlchemy
 #This is because the the extensions uses the db
@@ -82,7 +86,49 @@ def create_app(config_name):
         else:
             bucket_name_to_search = request.args.get('q')
             limit_to_return = request.args.get('limit')
+            page_given = request.args.get('page')
             no_argument_given = request.args
+            if page_given:
+                page = request.args.get(get_page_parameter(), type=int, default=1)
+                list_of_bucketlist = BucketList.query.filter_by(creator_id=user_id)
+                limit = 5
+                if limit_to_return:
+                    if int(limit_to_return) > 0:
+                        limit = int(limit_to_return)
+                start = 0
+                page_number = 1
+                items = list_of_bucketlist.count()
+                pages = math.ceil(items/limit)
+                if pages == 0:
+                    pages = 1
+                dictionary = {}
+                while page_number <= pages:
+                    dictionary.update({page_number : start})
+                    page_number += 1
+                    start += limit
+                buckets = []
+                chosen_page = dictionary.get(page)
+                finish = chosen_page + limit
+                while ( chosen_page < finish ):
+                    if chosen_page < items:
+                        a_bucket_object = {
+                            'id': list_of_bucketlist[chosen_page].id,
+                            'name': list_of_bucketlist[chosen_page].name,
+                            'date_created': list_of_bucketlist[chosen_page].date_created,
+                            'date_modified': list_of_bucketlist[chosen_page].date_modified,
+                            'creator_id': list_of_bucketlist[chosen_page].creator_id
+                            }
+                        buckets.append(a_bucket_object)
+                        chosen_page += 1
+                    else:
+                        chosen_page = finish
+                response = jsonify({
+                    'message': buckets,
+                    'pages': pages,
+                })
+                return make_response(response)
+
+
             if bucket_name_to_search == '':
                 response = jsonify({
                     'message': 'The search parameter has no string in it'
@@ -293,7 +339,48 @@ def create_app(config_name):
         else:
             search = request.args.get('q')
             limit_to_return = request.args.get('limit')
+            page_given = request.args.get('page')
             no_argument_given = request.args
+            if page_given:
+                page = request.args.get(get_page_parameter(), type=int, default=1)
+                activities_list = Activities.query.filter_by(bucket_id=bucket_id)
+                limit = 5
+                if limit_to_return:
+                    if int(limit_to_return) > 0:
+                        limit = int(limit_to_return)
+                start = 0
+                page_number = 1
+                items = activities_list.count()
+                pages = math.ceil(items/limit)
+                if pages == 0:
+                    pages = 1
+                dictionary = {}
+                while page_number <= pages:
+                    dictionary.update({page_number : start})
+                    page_number += 1
+                    start += limit
+                activities=[]
+                chosen_page = dictionary.get(page)
+                finish = chosen_page + limit
+                while ( chosen_page < finish ):
+                    if chosen_page < items:
+                        an_activity_object = {
+                            'id': activities_list[chosen_page].id,
+                            'activity_name': activities_list[chosen_page].activity_name,
+                            'date_created': activities_list[chosen_page].date_created,
+                            'date_modified': activities_list[chosen_page].date_modified,
+                            'bucket_id': activities_list[chosen_page].bucket_id
+                            }
+                        activities.append(an_activity_object)
+                        chosen_page += 1
+                    else:
+                        chosen_page = finish
+                response = jsonify({
+                    'message': activities,
+                    'pages': pages,
+                })
+                return make_response(response)
+
             if search == '':
                 response = jsonify({
                     'message': 'The search parameter has no string in it'
