@@ -34,8 +34,7 @@ Flask Api is a restful api that serves clients by allowing them to create, read,
 -To run the app on postman user `flask run`
 -Run the app using `python run.py `
 
-#API ENDPOINTS
-================================
+# API ENDPOINTS
 | **REQUEST** | **ENDPOINT**                      | **Public Access** |
 | ----------- | ----------------------------------| ----------------- |
 | POST        | /auth/register                    | True              |
