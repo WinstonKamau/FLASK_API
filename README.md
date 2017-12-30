@@ -36,31 +36,17 @@ Flask Api is a restful api that serves clients by allowing them to create, read,
 
 #API ENDPOINTS
 ================================
-**ENDPOINT** | **Public Access**
----------------------------------
-POST /auth/register | True
----------------------------
-POST /auth/login | True
-------------------------
-POST /auth/reset-password |True
---------------------------------
-POST /auth/logout |True
-------------------------
-POST /bucketlists/|False
--------------------------
-GET /bucketlists/|False
-------------------------
-GET /bucketlists/<id> | False
------------------------------
-PUT /bucketlists/<id>| False
------------------------------
-DELETE /bucketlists/<id> | False
----------------------------------
-POST /bucketlsits/<id>/items/ | False 
----------------------------------------------
-PUT /bucketlists/<id>/items/<item_id>| False
----------------------------------------------
-DELETE /bucketlists/<id>/items/<item_id>| False
-------------------------------------------------
-
-
+| **REQUEST** | **ENDPOINT**                      | **Public Access** |
+| ----------- | ----------------------------------| ----------------- |
+| POST        | /auth/register                    | True              |
+| POST        | /auth/login                       | True              |
+| POST        | /auth/reset-password              | True              |
+| POST        | /auth/logout                      | True              |
+| POST        | /bucketlists/                     | False             | 
+| GET         | /bucketlists/                     | False             |
+|GET          | /bucketlists/<id>                 | False             |
+| PUT         | /bucketlists/<id>                 | False             |
+| DELETE      | /bucketlists/<id>                 | False             |
+| POST        | /bucketlsits/<id>/items/          | False             |
+| PUT         | /bucketlists/<id>/items/<item_id> | False             |
+| DELETE      | /bucketlists/<id>/items/<item_id> | False             |
