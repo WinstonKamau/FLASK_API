@@ -5,34 +5,34 @@ import os
 
 class Configurations(object):
     '''Parent class for configurations under config.py module'''
-    DEBUG=False
-    CSRF_ENABLED=True
+    DEBUG = False
+    CSRF_ENABLED = True
     SECRET = os.getenv('SECRET')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 
 class UnderProduction(Configurations):
     '''Configurations for whent the mode is under production'''
-    DEBUG=False
-    TESTING=False
+    DEBUG = False
+    TESTING = False
 
 
 class UnderStaging(Configurations):
     '''Configurations for when the mode is staging'''
-    DEBUG=True
+    DEBUG = True
 
 
 class UnderTesting(Configurations):
     '''Configurations for when the mode is under testing, whereby a separate test
     database will be used under this mode'''
-    TESTING=True
+    TESTING = True
     SQL_ALCHEMY_DATABASE_URI = os.getenv('postgresql://localhost/test_db')
-    DEBUG=True
+    DEBUG = True
 
 
 class UnderDevelopment(Configurations):
     '''Configuration for when the mode is development'''
-    DEBUG=True
+    DEBUG = True
 
 
 app_configurations = {

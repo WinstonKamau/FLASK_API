@@ -101,7 +101,7 @@ class TheActivitiesTestCase(unittest.TestCase):
                                                                  ),
                                                     )
         self.assertEqual(result_of_get_activity_1.status_code, 200)
-        self.assertIn('Climb the Himalayas', str(result_of_get_activity_1.data))            
+        self.assertIn('Climb the Himalayas', str(result_of_get_activity_1.data))
         result_of_get_activity_2 = self.client().get('/bucketlists/1/items/2',
                                                      headers=dict(Authorization='Bearer '
                                                                   + self.token()
